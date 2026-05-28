@@ -5,6 +5,9 @@ import { env } from "./config/env.js";
 import morgan from "morgan";
 import cookieParser from "cookie-parser";
 
+// routes
+import userRoutes from "./routes/user.routes.js";
+
 
 const app = express();
 app.use(express.json());
@@ -15,6 +18,8 @@ app.use(cors({
 app.use(morgan("dev"));
 app.use(cookieParser());
 
+
+app.use("/api/user", userRoutes)
 
 app.use(errorMiddleware);
 

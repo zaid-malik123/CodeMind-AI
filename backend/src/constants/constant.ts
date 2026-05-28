@@ -12,6 +12,7 @@ export const HTTP_STATUS = {
 export const MESSAGES = {
   USER_CREATED: "User created successfully",
   LOGIN_SUCCESS: "Login successful",
+  USER_ALREADY_EXIST: "User already exist",
   INVALID_CREDENTIALS: "Invalid credentials",
   UNAUTHORIZED: "Unauthorized access",
   SERVER_ERROR: "Internal server error",
