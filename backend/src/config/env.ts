@@ -33,4 +33,6 @@ export const env = {
 
   REFRESH_TOKEN_EXPIRES_IN: (process.env.REFRESH_TOKEN_EXPIRES_IN ||
     "7d") as jwt.SignOptions["expiresIn"],
+
+  REDIS_HOST: process.env.REDIS_HOST || "redis://localhost:6379",
 };

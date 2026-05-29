@@ -19,9 +19,6 @@ const userSchema = new mongoose.Schema<IUser>(
   },
 );
 
-userSchema.index({ email: 1 });
-
-
 
 const User = mongoose.model<IUser>("User", userSchema);
 
