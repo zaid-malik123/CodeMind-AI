@@ -1,3 +1,5 @@
+import { env } from "../config/env.js"
+
 export const HTTP_STATUS = {
   OK: 200,
   CREATED: 201,
@@ -7,6 +9,17 @@ export const HTTP_STATUS = {
   NOT_FOUND: 404,
   CONFLICT: 409,
   INTERNAL_SERVER_ERROR: 500,
+} as const;
+
+export const COOKIE_OPTIONS = {
+  httpOnly: true,
+  secure: env.NODE_ENV === "production",
+  sameSite: env.NODE_ENV === "production" ? "strict" : "lax",
+} as const;
+
+export const COOKIE_EXPIRATION = {
+  ACCESS_TOKEN: 1000 * 60 * 15, // 15 minutes
+  REFRESH_TOKEN: 1000 * 60 * 60 * 24 * 7, // 7 days
 } as const;
 
 export const MESSAGES = {
