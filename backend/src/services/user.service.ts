@@ -24,6 +24,23 @@ class UserService {
         return user;
     }
 
+    async loginUser({email, password}: { email: string; password: string }) {
+
+        const user = await User.findOne({email});
+
+        if(!user) {
+            throw new ApiError(HTTP_STATUS.BAD_REQUEST, MESSAGES.USER_DOES_NOT_EXIST)
+        }
+
+        const isPasswordValid = await bcrypt.compare(password, user.password);
+
+        if(!isPasswordValid) {
+            throw new ApiError(HTTP_STATUS.BAD_REQUEST, MESSAGES.INVALID_CREDENTIALS)
+        }
+
+        return user;
+    }
+
 }
 
 export default new UserService();

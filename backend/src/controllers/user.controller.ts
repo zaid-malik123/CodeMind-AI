@@ -1,7 +1,11 @@
 import ApiResponse from "../utils/ApiResponse.js";
 import { asyncHandler } from "../utils/AsyncHandler.js";
 import userService from "../services/user.service.js";
-import { MESSAGES, COOKIE_OPTIONS, COOKIE_EXPIRATION } from "../constants/constant.js";
+import {
+  MESSAGES,
+  COOKIE_OPTIONS,
+  COOKIE_EXPIRATION,
+} from "../constants/constant.js";
 import { generateAccessToken, generateRefreshToken } from "../config/jwt.js";
 
 class UserController {
@@ -23,10 +27,32 @@ class UserController {
       maxAge: COOKIE_EXPIRATION.REFRESH_TOKEN,
     });
 
-
     return res
       .status(201)
-      .json(new ApiResponse(201,  MESSAGES.USER_CREATED, user));
+      .json(new ApiResponse(201, MESSAGES.USER_CREATED, user));
+  });
+
+  loginUser = asyncHandler(async (req, res) => {
+    const { email, password } = req.body;
+
+    const user = await userService.loginUser({ email, password });
+
+    const accessToken = generateAccessToken({ userId: user.id });
+    const refreshToken = generateRefreshToken({ userId: user.id });
+
+    res.cookie("accessToken", accessToken, {
+      ...COOKIE_OPTIONS,
+      maxAge: COOKIE_EXPIRATION.ACCESS_TOKEN,
+    });
+
+    res.cookie("refreshToken", refreshToken, {
+      ...COOKIE_OPTIONS,
+      maxAge: COOKIE_EXPIRATION.REFRESH_TOKEN,
+    });
+
+    return res
+      .status(200)
+      .json(new ApiResponse(200, MESSAGES.LOGIN_SUCCESS, user));
   });
 }
 
