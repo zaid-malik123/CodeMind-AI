@@ -1,0 +1,54 @@
+services:
+  backend:
+    build:
+      context: .
+      dockerfile: Dockerfile
+
+    container_name: codemind-backend
+
+    ports:
+      - "8000:8000"
+
+    env_file:
+      - .env
+
+    depends_on:
+      - redis
+      - rabbitmq
+
+    restart: unless-stopped
+
+    volumes:
+      - .:/app
+      - /app/node_modules
+
+  redis:
+    image: redis:7-alpine
+
+    container_name: codemind-redis
+
+    ports:
+      - "6379:6379"
+
+    restart: unless-stopped
+
+    volumes:
+      - redis_data:/data
+
+  rabbitmq:
+    image: rabbitmq:3-management
+
+    container_name: codemind-rabbitmq
+
+    ports:
+      - "5672:5672"
+      - "15672:15672"
+
+    restart: unless-stopped
+
+    volumes:
+      - rabbitmq_data:/var/lib/rabbitmq
+
+volumes:
+  redis_data:
+  rabbitmq_data:
