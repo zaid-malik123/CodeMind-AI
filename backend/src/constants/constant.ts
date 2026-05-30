@@ -22,6 +22,11 @@ export const COOKIE_EXPIRATION = {
   REFRESH_TOKEN: 1000 * 60 * 60 * 24 * 7, // 7 days
 } as const;
 
+export const TOKEN_EXPIRATION = {
+  ACCESS_TOKEN: "15m",
+  REFRESH_TOKEN: "7d",
+} as const;
+
 export const MESSAGES = {
   USER_CREATED: "User created successfully",
   LOGIN_SUCCESS: "Login successful",
@@ -29,7 +34,8 @@ export const MESSAGES = {
   USER_DOES_NOT_EXIST: "User does not exist please register",
   USER_FETCHED: "User fetched successfully",
   LOGOUT_SUCCESS: "Logout successful",
+  TOKEN_REFRESHED: "Access token refreshed successfully",
   INVALID_CREDENTIALS: "Invalid credentials",
   UNAUTHORIZED: "Unauthorized access",
   SERVER_ERROR: "Internal server error",
-} as const;
+} as const; 

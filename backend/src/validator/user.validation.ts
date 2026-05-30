@@ -33,3 +33,11 @@ export const loginValidator = [
     .isLength({ min: 6 })
     .withMessage("Password must be at least 6 characters"),
 ];
+
+export const refreshTokenValidator = [
+  body("refreshToken")
+    .notEmpty()
+    .withMessage("Refresh token is required")
+    .isString()
+    .withMessage("Refresh token must be a string"),
+];

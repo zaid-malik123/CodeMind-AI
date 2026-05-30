@@ -10,6 +10,11 @@ class RedisService {
         await redis.set(key, token, "EX", COOKIE_EXPIRATION.REFRESH_TOKEN);
     }
 
+    async getRefreshToken(userId: string): Promise<string | null> {
+        const key = REDIS_KEYS.REFRESH_TOKEN(userId);
+        return await redis.get(key);
+    }
+
     async removeRefreshToken(userId: string) {
         const key = REDIS_KEYS.REFRESH_TOKEN(userId);
         await redis.del(key);

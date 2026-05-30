@@ -7,7 +7,7 @@ import {
   COOKIE_EXPIRATION,
   HTTP_STATUS,
 } from "../constants/constant.js";
-import { generateAccessToken, generateRefreshToken } from "../config/jwt.js";
+import { generateAccessToken, generateRefreshToken, verifyRefreshToken } from "../config/jwt.js";
 import { AuthenticatedRequest } from "../middlewares/auth.middleware.js";
 import redisService from "../services/redis.service.js";
 
@@ -72,6 +72,34 @@ class UserController {
 
     return res.status(HTTP_STATUS.OK).json(new ApiResponse(HTTP_STATUS.OK, MESSAGES.LOGOUT_SUCCESS, {}));
   });
+
+  generateNewAccessToken = asyncHandler(async (req, res) => {
+    const { refreshToken } = req.cookies || req.body;
+
+    const decoded = verifyRefreshToken(refreshToken);
+    const storedRefreshToken = await redisService.getRefreshToken(decoded.userId);
+
+    if (storedRefreshToken !== refreshToken) {
+      return res.status(HTTP_STATUS.UNAUTHORIZED).json(new ApiResponse(HTTP_STATUS.UNAUTHORIZED, MESSAGES.UNAUTHORIZED, {}));
+    }
+
+    const accessToken = generateAccessToken({ userId: decoded.userId });
+    const newRefreshToken = generateRefreshToken({ userId: decoded.userId });
+
+    await redisService.setRefreshToken(decoded.userId, newRefreshToken);
+
+    res.cookie("accessToken", accessToken, {
+      ...COOKIE_OPTIONS,
+      maxAge: COOKIE_EXPIRATION.ACCESS_TOKEN,
+    });
+    res.cookie("refreshToken", newRefreshToken, {
+      ...COOKIE_OPTIONS,
+      maxAge: COOKIE_EXPIRATION.REFRESH_TOKEN,
+    });
+
+    return res.status(HTTP_STATUS.OK).json(new ApiResponse(HTTP_STATUS.OK, MESSAGES.TOKEN_REFRESHED, {}));
+    
+  })
 
   currentUser = asyncHandler(async (req: AuthenticatedRequest, res) => {
 

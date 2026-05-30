@@ -1,13 +1,12 @@
-
 import jwt from "jsonwebtoken";
-import type { Request, Response, NextFunction } from "express";
+import type { Response, NextFunction } from "express";
+import { AuthenticatedRequest } from "../types/types.js";
 
 import { env } from "../config/env.js";
-import User, { IUser } from "../models/user.model.js";
+import User from "../models/user.model.js";
+import { HTTP_STATUS, MESSAGES } from "../constants/constant.js";
 
-export interface AuthenticatedRequest extends Request {
-  user?: IUser;
-}
+
 
 interface JwtPayload {
   userId: string;
@@ -24,8 +23,8 @@ const authMiddleware = async (
       req.cookies.accessToken;
 
     if (!token) {
-      return res.status(401).json({
-        message: "Unauthorized: No token provided",
+      return res.status(HTTP_STATUS.UNAUTHORIZED).json({
+        message: MESSAGES.UNAUTHORIZED,
       });
     }
 
@@ -37,8 +36,8 @@ const authMiddleware = async (
     const user = await User.findById(decoded.userId).select("-password");
 
     if (!user) {
-      return res.status(401).json({
-        message: "Unauthorized: User not found",
+      return res.status(HTTP_STATUS.UNAUTHORIZED).json({
+        message: MESSAGES.UNAUTHORIZED,
       });
     }
 
@@ -46,8 +45,8 @@ const authMiddleware = async (
 
     next();
   } catch (error) {
-    return res.status(401).json({
-      message: "Unauthorized: Invalid token",
+    return res.status(HTTP_STATUS.UNAUTHORIZED).json({
+      message: MESSAGES.UNAUTHORIZED,
     });
   }
 };

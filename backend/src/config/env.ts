@@ -1,5 +1,4 @@
 import { config } from "dotenv";
-import jwt from "jsonwebtoken";
 config();
 
 if (!process.env.PORT) {
@@ -25,14 +24,9 @@ export const env = {
   ACCESS_TOKEN_SECRET:
     process.env.ACCESS_TOKEN_SECRET || "default_access_token_secret",
 
-  ACCESS_TOKEN_EXPIRES_IN: (process.env.ACCESS_TOKEN_EXPIRES_IN ||
-    "15m") as jwt.SignOptions["expiresIn"],
-
   REFRESH_TOKEN_SECRET:
     process.env.REFRESH_TOKEN_SECRET || "default_refresh_token_secret",
 
-  REFRESH_TOKEN_EXPIRES_IN: (process.env.REFRESH_TOKEN_EXPIRES_IN ||
-    "7d") as jwt.SignOptions["expiresIn"],
 
   REDIS_HOST: process.env.REDIS_HOST || "redis://localhost:6379",
 };

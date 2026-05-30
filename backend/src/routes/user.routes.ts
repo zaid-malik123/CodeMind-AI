@@ -2,6 +2,7 @@ import express from "express";
 import UserController from "../controllers/user.controller.js";
 import {
   loginValidator,
+  refreshTokenValidator,
   registerValidator,
 } from "../validator/user.validation.js";
 import { validateRequest } from "../middlewares/validation.middleware.js";
@@ -24,6 +25,13 @@ router.post(
 );
 
 router.get("/logout", authMiddleware, UserController.logoutUser);
+
+router.post(
+  "/refresh-token",
+  refreshTokenValidator,
+  validateRequest,
+  UserController.generateNewAccessToken,
+);
 
 router.get("/me", authMiddleware, UserController.currentUser);
 
