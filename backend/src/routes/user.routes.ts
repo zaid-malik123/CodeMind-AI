@@ -36,7 +36,7 @@ router.post(
 );
 
 router.post(
-  "/forgot-password/email",
+  "/forgot-password",
   forgotPasswordValidator,
   validateRequest,
   UserController.forgotPassword,

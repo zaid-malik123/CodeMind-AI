@@ -30,7 +30,7 @@ const authMiddleware = async (
 
     const decoded = jwt.verify(
       token,
-      env.ACCESS_TOKEN_SECRET
+      env.ACCESS_TOKEN_SECRET!
     ) as JwtPayload;
 
     const user = await User.findById(decoded.userId).select("-password");

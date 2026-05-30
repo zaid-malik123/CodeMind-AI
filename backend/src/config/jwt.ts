@@ -10,7 +10,7 @@ interface TokenPayload {
 export const generateAccessToken = ({ userId }: TokenPayload) => {
   return jwt.sign(
     { userId },
-    env.ACCESS_TOKEN_SECRET,
+    env.ACCESS_TOKEN_SECRET!,
     {
       expiresIn: TOKEN_EXPIRATION.ACCESS_TOKEN as SignOptions["expiresIn"],
     }
@@ -20,7 +20,7 @@ export const generateAccessToken = ({ userId }: TokenPayload) => {
 export const generateRefreshToken = ({ userId }: TokenPayload) => {
   return jwt.sign(
     { userId },
-    env.REFRESH_TOKEN_SECRET,
+    env.REFRESH_TOKEN_SECRET!,
     {
       expiresIn: TOKEN_EXPIRATION.REFRESH_TOKEN as SignOptions["expiresIn"],
     }
@@ -28,9 +28,9 @@ export const generateRefreshToken = ({ userId }: TokenPayload) => {
 };
 
 export const verifyAccessToken = (token: string): TokenPayload => {
-  return jwt.verify(token, env.ACCESS_TOKEN_SECRET) as TokenPayload;
+  return jwt.verify(token, env.ACCESS_TOKEN_SECRET!) as TokenPayload;
 };
 
 export const verifyRefreshToken = (token: string): TokenPayload => {
-  return jwt.verify(token, env.REFRESH_TOKEN_SECRET) as TokenPayload;
+  return jwt.verify(token, env.REFRESH_TOKEN_SECRET!) as TokenPayload;
 };

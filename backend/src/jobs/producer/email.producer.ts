@@ -8,6 +8,7 @@ export const emailProducer = async (
 
   const channel = getChannel();
 
+
   await channel.sendToQueue(
     RABBIT_QUEUES.EMAIL_QUEUE,
     Buffer.from(
@@ -17,4 +18,5 @@ export const emailProducer = async (
       persistent: true
     }
   );
+
 };

@@ -7,6 +7,8 @@ const channel = getChannel()
 
 export const emailConsumer = async () => {
 
+    logger.info("Email consumer started, waiting for messages...");
+
     channel.consume(RABBIT_QUEUES.EMAIL_QUEUE, async (msg) => {
 
         try {
