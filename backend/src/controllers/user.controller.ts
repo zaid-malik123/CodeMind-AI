@@ -8,7 +8,7 @@ import {
   HTTP_STATUS,
 } from "../constants/constant.js";
 import { generateAccessToken, generateRefreshToken, verifyRefreshToken } from "../config/jwt.js";
-import { AuthenticatedRequest } from "../middlewares/auth.middleware.js";
+import { AuthenticatedRequest } from "../types/types.js";
 import redisService from "../services/redis.service.js";
 
 class UserController {
