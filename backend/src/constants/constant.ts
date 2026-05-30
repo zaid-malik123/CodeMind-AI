@@ -32,6 +32,10 @@ export const AUTH_COOKIES = {
   REFRESH_TOKEN: "refreshToken",
 }
 
+export const RABBIT_QUEUES = {
+  EMAIL_QUEUE: "email_queue",
+} as const;
+
 export const MESSAGES = {
   USER_CREATED: "User created successfully",
   LOGIN_SUCCESS: "Login successful",

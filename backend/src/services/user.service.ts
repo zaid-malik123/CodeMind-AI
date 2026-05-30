@@ -5,7 +5,7 @@ import bcrypt  from "bcryptjs";
 import { verifyRefreshToken } from "../config/jwt.js";
 import redisService from "./redis.service.js";
 import { generateAuthTokens } from "../utils/auth.utils.js";
-import { setAuthCookies } from "../utils/cookie.utils.js";
+import { generateOtp } from "../utils/generateOtp.js";
 
 class UserService {
 
@@ -74,6 +74,21 @@ class UserService {
         }
 
         return user;
+    }
+
+    async forgotPassword(email: string) {
+        const user = await User.findOne({ email });
+
+        if (!user) {
+            throw new ApiError(HTTP_STATUS.NOT_FOUND, MESSAGES.USER_DOES_NOT_EXIST);
+        }
+
+        const otp = generateOtp();
+
+        await redisService.setOtp(email, otp);
+
+        
+
     }
 
 }

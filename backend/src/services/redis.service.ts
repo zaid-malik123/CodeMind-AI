@@ -19,6 +19,13 @@ class RedisService {
         const key = REDIS_KEYS.REFRESH_TOKEN(userId);
         await redis.del(key);
     }
+
+    async setOtp(email: string, otp: string) {
+        const key = REDIS_KEYS.PASSWORD_RESET_OTP(email);
+        await redis.set(key, otp, "EX", 300); // OTP expires in 5 minutes
+    }
+
+    
 }
 
 export default new RedisService();

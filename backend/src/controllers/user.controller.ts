@@ -71,6 +71,13 @@ class UserController {
       .status(HTTP_STATUS.OK)
       .json(new ApiResponse(HTTP_STATUS.OK, MESSAGES.USER_FETCHED, user));
   });
+
+  // forgotPassword = asyncHandler(async (req, res) => {
+  //   const { email } = req.body || req.params;
+
+  //   await userService.forgotPassword(email);
+
+    
 }
 
 export default new UserController();

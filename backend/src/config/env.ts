@@ -43,6 +43,12 @@ if (!process.env.APP_PASSWORD) {
   );
 }
 
+if(!process.env.RABBITMQ_URL) {
+  console.warn(
+    "RABBITMQ_URL is not defined in environment variables. Using default value 'amqp://guest:guest@localhost:5672'.",
+  );
+}
+
 export const env = {
   PORT: process.env.PORT || 5000,
   MONGO_URI: process.env.MONGO_URI,
@@ -57,8 +63,9 @@ export const env = {
   REFRESH_TOKEN_SECRET:
     process.env.REFRESH_TOKEN_SECRET,
 
-  REDIS_HOST: process.env.REDIS_HOST,
+  REDIS_HOST: process.env.REDIS_HOST || "redis://localhost:6379",
 
   EMAIL_USER: process.env.EMAIL_USER ,
   APP_PASSWORD: process.env.APP_PASSWORD ,
+  RABBIT_URL: process.env.RABBIT_URL,
 };
