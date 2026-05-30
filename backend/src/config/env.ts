@@ -49,6 +49,24 @@ if(!process.env.RABBITMQ_URL) {
   );
 }
 
+if(!process.env.CLOUDINARY_CLOUD_NAME) {
+  console.warn(
+    "CLOUDINARY_CLOUD_NAME is not defined in environment variables.",
+  );
+}
+
+if(!process.env.CLOUDINARY_API_KEY) {
+  console.warn(
+    "CLOUDINARY_API_KEY is not defined in environment variables.",
+  );
+}
+
+if(!process.env.CLOUDINARY_API_SECRET) {
+  console.warn(
+    "CLOUDINARY_API_SECRET is not defined in environment variables.",
+  );
+}
+
 export const env = {
   PORT: process.env.PORT || 5000,
   MONGO_URI: process.env.MONGO_URI,
@@ -68,4 +86,8 @@ export const env = {
   EMAIL_USER: process.env.EMAIL_USER ,
   APP_PASSWORD: process.env.APP_PASSWORD ,
   RABBIT_URL: process.env.RABBIT_URL,
+
+  CLOUDINARY_CLOUD_NAME: process.env.CLOUDINARY_CLOUD_NAME,
+  CLOUDINARY_API_KEY: process.env.CLOUDINARY_API_KEY,
+  CLOUDINARY_API_SECRET: process.env.CLOUDINARY_API_SECRET,
 };
