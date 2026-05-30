@@ -27,6 +27,11 @@ export const TOKEN_EXPIRATION = {
   REFRESH_TOKEN: "7d",
 } as const;
 
+export const AUTH_COOKIES = {
+  ACCESS_TOKEN: "accessToken",
+  REFRESH_TOKEN: "refreshToken",
+}
+
 export const MESSAGES = {
   USER_CREATED: "User created successfully",
   LOGIN_SUCCESS: "Login successful",

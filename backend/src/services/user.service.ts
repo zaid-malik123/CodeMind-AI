@@ -2,6 +2,10 @@ import User from "../models/user.model.js"
 import ApiError from "../utils/ApiError.js";
 import { HTTP_STATUS, MESSAGES} from "../constants/constant.js"
 import bcrypt  from "bcryptjs";
+import { verifyRefreshToken } from "../config/jwt.js";
+import redisService from "./redis.service.js";
+import { generateAuthTokens } from "../utils/auth.utils.js";
+import { setAuthCookies } from "../utils/cookie.utils.js";
 
 class UserService {
 
@@ -20,6 +24,7 @@ class UserService {
             email,
             password: hashedPassword
         })
+
 
         return user;
     }
@@ -41,8 +46,28 @@ class UserService {
         return user;
     }
 
+    async refreshToken(refreshToken: string) {
+
+        if(!refreshToken) {
+            throw new ApiError(HTTP_STATUS.UNAUTHORIZED, MESSAGES.UNAUTHORIZED)
+        }
+
+        const decoded = verifyRefreshToken(refreshToken);
+
+        const storedRefreshToken = await redisService.getRefreshToken(decoded.userId);
+
+        if(storedRefreshToken !== refreshToken) {
+            throw new ApiError(HTTP_STATUS.UNAUTHORIZED, MESSAGES.UNAUTHORIZED)
+        }
+
+        const { accessToken, refreshToken: newRefreshToken } = await generateAuthTokens(decoded.userId);
+
+        return { accessToken, refreshToken: newRefreshToken };
+
+    }
+
     async getUserById(userId: string) {
-        const user = await User.findById(userId);
+        const user = await User.findById(userId).select("-password");
 
         if(!user) {
             throw new ApiError(HTTP_STATUS.NOT_FOUND, MESSAGES.USER_DOES_NOT_EXIST)
