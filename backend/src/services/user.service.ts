@@ -7,6 +7,7 @@ import redisService from "./redis.service.js";
 import { generateAuthTokens } from "../utils/auth.utils.js";
 import { generateOtp } from "../utils/generateOtp.js";
 import { emailProducer } from "../jobs/producer/email.producer.js";
+import { uploadOnCloud } from "./uploadOnCloud.service.js";
 
 class UserService {
   async registerUser({
@@ -98,7 +99,15 @@ class UserService {
     return;
   }
 
-  async resetPassword({ email, otp, newPassword }: { email: string; otp: string; newPassword: string }) {
+  async resetPassword({
+    email,
+    otp,
+    newPassword,
+  }: {
+    email: string;
+    otp: string;
+    newPassword: string;
+  }) {
     const user = await User.findOne({ email });
 
     if (!user) {
@@ -119,6 +128,35 @@ class UserService {
     await redisService.removeOtp(email);
 
     return;
+  }
+
+  async updateProfile({
+    userId,
+    name,
+    image,
+  }: {
+    userId: string;
+    name?: string;
+    image?: Express.Multer.File;
+  }) {
+    const user = await User.findById(userId);
+
+    if (!user) {
+      throw new ApiError(HTTP_STATUS.NOT_FOUND, MESSAGES.USER_DOES_NOT_EXIST);
+    }
+
+    if (name) {
+      user.name = name;
+    }
+
+    if (image) {
+      const imageUrl = await uploadOnCloud(image);
+      user.imageUrl = imageUrl;
+    }
+
+    await user.save();
+
+    return user;
   }
 }
 

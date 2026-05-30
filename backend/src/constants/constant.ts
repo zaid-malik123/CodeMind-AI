@@ -50,4 +50,5 @@ export const MESSAGES = {
   INVALID_CREDENTIALS: "Invalid credentials",
   UNAUTHORIZED: "Unauthorized access",
   SERVER_ERROR: "Internal server error",
+  PROFILE_UPDATED: "Profile updated successfully",
 } as const; 

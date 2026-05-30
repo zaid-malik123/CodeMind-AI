@@ -77,21 +77,37 @@ class UserController {
 
     await userService.forgotPassword(email);
 
-    res.status(HTTP_STATUS.OK).json(
-      new ApiResponse(HTTP_STATUS.OK, MESSAGES.MESSAGE_OTP_SENT, {})
-    );
+    res
+      .status(HTTP_STATUS.OK)
+      .json(new ApiResponse(HTTP_STATUS.OK, MESSAGES.MESSAGE_OTP_SENT, {}));
   });
 
   resetPassword = asyncHandler(async (req, res) => {
-
     const { email, otp, newPassword } = req.body;
 
     await userService.resetPassword({ email, otp, newPassword });
 
-    res.status(HTTP_STATUS.OK).json(
-      new ApiResponse(HTTP_STATUS.OK, MESSAGES.PASSWORD_RESET_SUCCESS, {})
-    );
+    res
+      .status(HTTP_STATUS.OK)
+      .json(
+        new ApiResponse(HTTP_STATUS.OK, MESSAGES.PASSWORD_RESET_SUCCESS, {}),
+      );
+  });
 
+  updateProfile = asyncHandler(async (req: AuthenticatedRequest, res) => {
+    const userId = req.user!._id.toString();
+
+    const { name } = req.body;
+
+    const updatedUser = await userService.updateProfile({
+      userId,
+      name,
+      image: req.file,
+    });
+
+    return res
+      .status(HTTP_STATUS.OK)
+      .json(new ApiResponse(HTTP_STATUS.OK, MESSAGES.PROFILE_UPDATED, updatedUser));
   });
 }
 
