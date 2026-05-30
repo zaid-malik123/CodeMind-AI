@@ -1,96 +1,102 @@
-import User from "../models/user.model.js"
+import User from "../models/user.model.js";
 import ApiError from "../utils/ApiError.js";
-import { HTTP_STATUS, MESSAGES} from "../constants/constant.js"
-import bcrypt  from "bcryptjs";
+import { HTTP_STATUS, MESSAGES } from "../constants/constant.js";
+import bcrypt from "bcryptjs";
 import { verifyRefreshToken } from "../config/jwt.js";
 import redisService from "./redis.service.js";
 import { generateAuthTokens } from "../utils/auth.utils.js";
 import { generateOtp } from "../utils/generateOtp.js";
+import { emailProducer } from "../jobs/producer/email.producer.js";
 
 class UserService {
+  async registerUser({
+    name,
+    email,
+    password,
+  }: {
+    name: string;
+    email: string;
+    password: string;
+  }) {
+    const existingUser = await User.findOne({ email });
 
-    async registerUser({name, email, password}: { name: string; email: string; password: string }) {
-
-        const existingUser = await User.findOne({email});
-
-        if(existingUser) {
-            throw new ApiError(HTTP_STATUS.BAD_REQUEST, MESSAGES.USER_ALREADY_EXIST)
-        }
-
-        const hashedPassword = await bcrypt.hash(password, 12);
-
-        const user = await User.create({
-            name,
-            email,
-            password: hashedPassword
-        })
-
-
-        return user;
+    if (existingUser) {
+      throw new ApiError(HTTP_STATUS.BAD_REQUEST, MESSAGES.USER_ALREADY_EXIST);
     }
 
-    async loginUser({email, password}: { email: string; password: string }) {
+    const hashedPassword = await bcrypt.hash(password, 12);
 
-        const user = await User.findOne({email});
+    const user = await User.create({
+      name,
+      email,
+      password: hashedPassword,
+    });
 
-        if(!user) {
-            throw new ApiError(HTTP_STATUS.BAD_REQUEST, MESSAGES.USER_DOES_NOT_EXIST)
-        }
+    return user;
+  }
 
-        const isPasswordValid = await bcrypt.compare(password, user.password);
+  async loginUser({ email, password }: { email: string; password: string }) {
+    const user = await User.findOne({ email });
 
-        if(!isPasswordValid) {
-            throw new ApiError(HTTP_STATUS.BAD_REQUEST, MESSAGES.INVALID_CREDENTIALS)
-        }
-
-        return user;
+    if (!user) {
+      throw new ApiError(HTTP_STATUS.BAD_REQUEST, MESSAGES.USER_DOES_NOT_EXIST);
     }
 
-    async refreshToken(refreshToken: string) {
+    const isPasswordValid = await bcrypt.compare(password, user.password);
 
-        if(!refreshToken) {
-            throw new ApiError(HTTP_STATUS.UNAUTHORIZED, MESSAGES.UNAUTHORIZED)
-        }
-
-        const decoded = verifyRefreshToken(refreshToken);
-
-        const storedRefreshToken = await redisService.getRefreshToken(decoded.userId);
-
-        if(storedRefreshToken !== refreshToken) {
-            throw new ApiError(HTTP_STATUS.UNAUTHORIZED, MESSAGES.UNAUTHORIZED)
-        }
-
-        const { accessToken, refreshToken: newRefreshToken } = await generateAuthTokens(decoded.userId);
-
-        return { accessToken, refreshToken: newRefreshToken };
-
+    if (!isPasswordValid) {
+      throw new ApiError(HTTP_STATUS.BAD_REQUEST, MESSAGES.INVALID_CREDENTIALS);
     }
 
-    async getUserById(userId: string) {
-        const user = await User.findById(userId).select("-password");
+    return user;
+  }
 
-        if(!user) {
-            throw new ApiError(HTTP_STATUS.NOT_FOUND, MESSAGES.USER_DOES_NOT_EXIST)
-        }
-
-        return user;
+  async refreshToken(refreshToken: string) {
+    if (!refreshToken) {
+      throw new ApiError(HTTP_STATUS.UNAUTHORIZED, MESSAGES.UNAUTHORIZED);
     }
 
-    async forgotPassword(email: string) {
-        const user = await User.findOne({ email });
+    const decoded = verifyRefreshToken(refreshToken);
 
-        if (!user) {
-            throw new ApiError(HTTP_STATUS.NOT_FOUND, MESSAGES.USER_DOES_NOT_EXIST);
-        }
+    const storedRefreshToken = await redisService.getRefreshToken(
+      decoded.userId,
+    );
 
-        const otp = generateOtp();
-
-        await redisService.setOtp(email, otp);
-
-        
-
+    if (storedRefreshToken !== refreshToken) {
+      throw new ApiError(HTTP_STATUS.UNAUTHORIZED, MESSAGES.UNAUTHORIZED);
     }
 
+    const { accessToken, refreshToken: newRefreshToken } =
+      await generateAuthTokens(decoded.userId);
+
+    return { accessToken, refreshToken: newRefreshToken };
+  }
+
+  async getUserById(userId: string) {
+    const user = await User.findById(userId).select("-password");
+
+    if (!user) {
+      throw new ApiError(HTTP_STATUS.NOT_FOUND, MESSAGES.USER_DOES_NOT_EXIST);
+    }
+
+    return user;
+  }
+
+  async forgotPassword(email: string) {
+    const user = await User.findOne({ email });
+
+    if (!user) {
+      throw new ApiError(HTTP_STATUS.NOT_FOUND, MESSAGES.USER_DOES_NOT_EXIST);
+    }
+
+    const otp = generateOtp();
+
+    await redisService.setOtp(email, otp);
+
+    await emailProducer(email, otp);
+
+    return;
+  }
 }
 
 export default new UserService();

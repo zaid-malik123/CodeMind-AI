@@ -72,12 +72,15 @@ class UserController {
       .json(new ApiResponse(HTTP_STATUS.OK, MESSAGES.USER_FETCHED, user));
   });
 
-  // forgotPassword = asyncHandler(async (req, res) => {
-  //   const { email } = req.body || req.params;
+  forgotPassword = asyncHandler(async (req, res) => {
+    const { email } = req.body;
 
-  //   await userService.forgotPassword(email);
+    await userService.forgotPassword(email);
 
-    
+    res.status(HTTP_STATUS.OK).json(
+      new ApiResponse(HTTP_STATUS.OK, MESSAGES.MESSAGE_OTP_SENT, {})
+    );
+  });
 }
 
 export default new UserController();

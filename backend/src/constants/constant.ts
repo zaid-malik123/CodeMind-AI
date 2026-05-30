@@ -43,6 +43,7 @@ export const MESSAGES = {
   USER_DOES_NOT_EXIST: "User does not exist please register",
   USER_FETCHED: "User fetched successfully",
   LOGOUT_SUCCESS: "Logout successful",
+  MESSAGE_OTP_SENT: "OTP sent to email successfully",
   TOKEN_REFRESHED: "Access token refreshed successfully",
   INVALID_CREDENTIALS: "Invalid credentials",
   UNAUTHORIZED: "Unauthorized access",
