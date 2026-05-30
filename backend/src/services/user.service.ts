@@ -97,6 +97,29 @@ class UserService {
 
     return;
   }
+
+  async resetPassword({ email, otp, newPassword }: { email: string; otp: string; newPassword: string }) {
+    const user = await User.findOne({ email });
+
+    if (!user) {
+      throw new ApiError(HTTP_STATUS.NOT_FOUND, MESSAGES.USER_DOES_NOT_EXIST);
+    }
+
+    const storedOtp = await redisService.getOtp(email);
+
+    if (storedOtp !== otp) {
+      throw new ApiError(HTTP_STATUS.BAD_REQUEST, MESSAGES.INVALID_OTP);
+    }
+
+    const hashedPassword = await bcrypt.hash(newPassword, 12);
+
+    user.password = hashedPassword;
+    await user.save();
+
+    await redisService.removeOtp(email);
+
+    return;
+  }
 }
 
 export default new UserService();

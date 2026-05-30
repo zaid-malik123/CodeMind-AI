@@ -1,9 +1,11 @@
 import express from "express";
 import UserController from "../controllers/user.controller.js";
 import {
+  forgotPasswordValidator,
   loginValidator,
   refreshTokenValidator,
   registerValidator,
+  resetPasswordValidator,
 } from "../validator/user.validation.js";
 import { validateRequest } from "../middlewares/validation.middleware.js";
 import authMiddleware from "../middlewares/auth.middleware.js";
@@ -31,6 +33,20 @@ router.post(
   refreshTokenValidator,
   validateRequest,
   UserController.generateNewAccessToken,
+);
+
+router.post(
+  "/forgot-password/email",
+  forgotPasswordValidator,
+  validateRequest,
+  UserController.forgotPassword,
+);
+
+router.post(
+  "/reset-password",
+  resetPasswordValidator,
+  validateRequest,
+  UserController.resetPassword,
 );
 
 router.get("/me", authMiddleware, UserController.currentUser);

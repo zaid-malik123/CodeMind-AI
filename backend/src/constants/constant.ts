@@ -44,6 +44,8 @@ export const MESSAGES = {
   USER_FETCHED: "User fetched successfully",
   LOGOUT_SUCCESS: "Logout successful",
   MESSAGE_OTP_SENT: "OTP sent to email successfully",
+  INVALID_OTP: "Invalid OTP",
+  PASSWORD_RESET_SUCCESS: "Password reset successful",
   TOKEN_REFRESHED: "Access token refreshed successfully",
   INVALID_CREDENTIALS: "Invalid credentials",
   UNAUTHORIZED: "Unauthorized access",
