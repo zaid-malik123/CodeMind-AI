@@ -3,9 +3,9 @@ import { RABBIT_QUEUES } from "../../constants/constant.js";
 import { logger } from "../../logger/logger.js";
 import { emailWorker } from "../../worker/email.worker.js";
 
-const channel = getChannel()
 
 export const emailConsumer = async () => {
+    const channel = getChannel()
 
     logger.info("Email consumer started, waiting for messages...");
 
