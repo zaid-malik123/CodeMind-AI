@@ -1,8 +1,9 @@
 import { MESSAGES } from "../constants/constant.js";
 import Repository from "../models/repo.model.js";
-import { cloneRepository } from "../services/clone.service.js";
-import { readRepositoryFiles } from "../services/read.service.js";
-import { scanRepository } from "../services/scan.service.js";
+import { createChunks } from "../services/repository/chunk.service.js";
+import { cloneRepository } from "../services/repository/clone.service.js";
+import { readRepositoryFiles } from "../services/repository/read.service.js";
+import { scanRepository } from "../services/repository/scan.service.js";
 
 export const repoWorker = async (repoId: string) => {
   const repo = await Repository.findById(repoId);
@@ -20,5 +21,8 @@ export const repoWorker = async (repoId: string) => {
 
   const files = await readRepositoryFiles(filePaths);
 
+  const chunks = await createChunks(files);
+
+  
 
 };

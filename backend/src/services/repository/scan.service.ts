@@ -4,7 +4,6 @@ export const scanRepository = async (
   localPath: string
 ) => {
 
-  console.log("ENTRY LELE MAINE ")
 
   const files = await fg(
     [
