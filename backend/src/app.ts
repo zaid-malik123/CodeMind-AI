@@ -22,6 +22,8 @@ app.use(cookieParser());
 // routes
 app.use("/api/user", userRoutes)
 
+
+
 app.use(errorMiddleware);
 
 

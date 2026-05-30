@@ -12,6 +12,7 @@ export const connectRabbitMQ = async () => {
     channel = await connection.createChannel();
 
     channel.assertQueue(RABBIT_QUEUES.EMAIL_QUEUE, { durable: true });
+    channel.assertQueue(RABBIT_QUEUES.REPOSITORY_QUEUE, { durable: true });
 
     logger.info("Connected to RabbitMQ");
 

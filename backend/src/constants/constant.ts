@@ -34,6 +34,7 @@ export const AUTH_COOKIES = {
 
 export const RABBIT_QUEUES = {
   EMAIL_QUEUE: "email_queue",
+  REPOSITORY_QUEUE: "repository_queue",
 } as const;
 
 export const MESSAGES = {
