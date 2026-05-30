@@ -5,6 +5,7 @@ import {
   registerValidator,
 } from "../validator/user.validation.js";
 import { validateRequest } from "../middlewares/validation.middleware.js";
+import authMiddleware from "../middlewares/auth.middleware.js";
 
 const router = express.Router();
 
@@ -21,5 +22,9 @@ router.post(
   validateRequest,
   UserController.loginUser,
 );
+
+router.get("/logout", authMiddleware, UserController.logoutUser);
+
+router.get("/me", authMiddleware, UserController.currentUser);
 
 export default router;

@@ -5,8 +5,11 @@ import {
   MESSAGES,
   COOKIE_OPTIONS,
   COOKIE_EXPIRATION,
+  HTTP_STATUS,
 } from "../constants/constant.js";
 import { generateAccessToken, generateRefreshToken } from "../config/jwt.js";
+import { AuthenticatedRequest } from "../middlewares/auth.middleware.js";
+import redisService from "../services/redis.service.js";
 
 class UserController {
   registerUser = asyncHandler(async (req, res) => {
@@ -16,6 +19,8 @@ class UserController {
 
     const accessToken = generateAccessToken({ userId: user.id });
     const refreshToken = generateRefreshToken({ userId: user.id });
+
+    await redisService.setRefreshToken(user.id, refreshToken);
 
     res.cookie("accessToken", accessToken, {
       ...COOKIE_OPTIONS,
@@ -28,8 +33,8 @@ class UserController {
     });
 
     return res
-      .status(201)
-      .json(new ApiResponse(201, MESSAGES.USER_CREATED, user));
+      .status(HTTP_STATUS.CREATED)
+      .json(new ApiResponse(HTTP_STATUS.CREATED, MESSAGES.USER_CREATED, user));
   });
 
   loginUser = asyncHandler(async (req, res) => {
@@ -50,9 +55,33 @@ class UserController {
       maxAge: COOKIE_EXPIRATION.REFRESH_TOKEN,
     });
 
+    await redisService.setRefreshToken(user.id, refreshToken);
+
     return res
-      .status(200)
-      .json(new ApiResponse(200, MESSAGES.LOGIN_SUCCESS, user));
+      .status(HTTP_STATUS.OK)
+      .json(new ApiResponse(HTTP_STATUS.OK, MESSAGES.LOGIN_SUCCESS, user));
+  });
+
+  logoutUser = asyncHandler(async (req: AuthenticatedRequest, res) => {
+    const userId = req.user?._id.toString();
+
+    await redisService.removeRefreshToken(userId!);
+
+    res.clearCookie("accessToken");
+    res.clearCookie("refreshToken");
+
+    return res.status(HTTP_STATUS.OK).json(new ApiResponse(HTTP_STATUS.OK, MESSAGES.LOGOUT_SUCCESS, {}));
+  });
+
+  currentUser = asyncHandler(async (req: AuthenticatedRequest, res) => {
+
+    const userId = req.user?._id.toString();
+
+    const user = await userService.getUserById(userId as string);
+
+
+    return res.status(HTTP_STATUS.OK).json(new ApiResponse(HTTP_STATUS.OK, MESSAGES.USER_FETCHED, user));
+    
   });
 }
 

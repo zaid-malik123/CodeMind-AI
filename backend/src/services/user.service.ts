@@ -41,6 +41,16 @@ class UserService {
         return user;
     }
 
+    async getUserById(userId: string) {
+        const user = await User.findById(userId);
+
+        if(!user) {
+            throw new ApiError(HTTP_STATUS.NOT_FOUND, MESSAGES.USER_DOES_NOT_EXIST)
+        }
+
+        return user;
+    }
+
 }
 
 export default new UserService();

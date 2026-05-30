@@ -27,6 +27,8 @@ export const MESSAGES = {
   LOGIN_SUCCESS: "Login successful",
   USER_ALREADY_EXIST: "User already exist",
   USER_DOES_NOT_EXIST: "User does not exist please register",
+  USER_FETCHED: "User fetched successfully",
+  LOGOUT_SUCCESS: "Logout successful",
   INVALID_CREDENTIALS: "Invalid credentials",
   UNAUTHORIZED: "Unauthorized access",
   SERVER_ERROR: "Internal server error",
