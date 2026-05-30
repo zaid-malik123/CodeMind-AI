@@ -9,6 +9,7 @@ import {
 } from "../validator/user.validation.js";
 import { validateRequest } from "../middlewares/validation.middleware.js";
 import authMiddleware from "../middlewares/auth.middleware.js";
+import upload from "../middlewares/multer.middleware.js";
 
 const router = express.Router();
 
@@ -50,5 +51,12 @@ router.post(
 );
 
 router.get("/me", authMiddleware, UserController.currentUser);
+
+router.post(
+  "/update-profile",
+  authMiddleware,
+  upload.single("image"),
+  UserController.updateProfile,
+);
 
 export default router;
