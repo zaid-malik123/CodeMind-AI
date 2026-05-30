@@ -1,5 +1,7 @@
 import { MESSAGES } from "../constants/constant.js";
 import Repository from "../models/repo.model.js";
+import { generateEmbedding } from "../services/ai/embedding.service.js";
+import { saveEmbeddings } from "../services/ai/vector.service.js";
 import { createChunks } from "../services/repository/chunk.service.js";
 import { cloneRepository } from "../services/repository/clone.service.js";
 import { readRepositoryFiles } from "../services/repository/read.service.js";
@@ -23,6 +25,9 @@ export const repoWorker = async (repoId: string) => {
 
   const chunks = await createChunks(files);
 
-  
+  const limittedChunks = chunks.slice(0, 1)
+
+  await saveEmbeddings(repoId, limittedChunks);
+
 
 };

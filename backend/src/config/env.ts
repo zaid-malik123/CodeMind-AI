@@ -67,6 +67,18 @@ if(!process.env.CLOUDINARY_API_SECRET) {
   );
 }
 
+if(!process.env.AI_API_KEY) {
+  console.warn(
+    "AI_API_KEY is not defined in environment variables. AI functionality may not work properly.",
+  );
+}
+
+if(!process.env.VECTOR_DB_API_KEY) {
+  console.warn(
+    "VECTOR_DB_API_KEY is not defined in environment variables. Vector database functionality may not work properly.",
+  );
+}
+
 export const env = {
   PORT: process.env.PORT || 5000,
   MONGO_URI: process.env.MONGO_URI,
@@ -90,4 +102,8 @@ export const env = {
   CLOUDINARY_CLOUD_NAME: process.env.CLOUDINARY_CLOUD_NAME,
   CLOUDINARY_API_KEY: process.env.CLOUDINARY_API_KEY,
   CLOUDINARY_API_SECRET: process.env.CLOUDINARY_API_SECRET,
+
+  AI_API_KEY: process.env.AI_API_KEY,
+  VECTOR_DB_API_KEY: process.env.VECTOR_DB_API_KEY,
 };
+  

@@ -17,6 +17,8 @@ export const COOKIE_OPTIONS = {
   sameSite: env.NODE_ENV === "production" ? "strict" : "lax",
 } as const;
 
+export const PINECONE_INDEX_NAME = "code-mind-ai" as const;
+
 export const COOKIE_EXPIRATION = {
   ACCESS_TOKEN: 1000 * 60 * 15, // 15 minutes
   REFRESH_TOKEN: 1000 * 60 * 60 * 24 * 7, // 7 days
