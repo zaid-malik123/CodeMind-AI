@@ -2,6 +2,8 @@ import { AuthenticatedRequest } from "../types/types.js";
 import type { Response } from "express";
 import { asyncHandler } from "../utils/AsyncHandler.js";
 import repoService from "../services/repo.service.js";
+import { HTTP_STATUS, MESSAGES } from "../constants/constant.js";
+import ApiResponse from "../utils/ApiResponse.js";
 
 class RepoController {
 
@@ -11,11 +13,11 @@ class RepoController {
 
         const userId = req.user!._id.toString();
 
-        await repoService.createRepo({ repoName, githubUrl, userId });
+        const repo = await repoService.createRepo({ repoName, githubUrl, userId });
 
-        res.status(201).json({ message: "Repository added successfully" });
-        
-
+        res.status(HTTP_STATUS.CREATED).json(
+            new ApiResponse(HTTP_STATUS.CREATED, MESSAGES.REPO_CREATED, repo)
+        )        
 
     })
 }

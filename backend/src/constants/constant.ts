@@ -39,6 +39,21 @@ export const RABBIT_QUEUES = {
   REPOSITORY_QUEUE: "repository_queue",
 } as const;
 
+export const SOCKER_EMMIT = {
+  REPO_EMMIT: "repo-status",
+  SOCKET_ROOM_ID: "join-room"
+}
+
+export const REPO_STATUS = {
+  REPO_PENDING: "pending",
+  REPO_CLONNING: "cloning",
+  REPO_SCANNING: "scanning",
+  REPO_CHUNKING: "chunking",
+  REPO_EMBEDDING: "embedding",
+  REPO_READY: "ready",
+  REPO_FAILED: "failed"
+}
+
 export const MESSAGES = {
   USER_CREATED: "User created successfully",
   LOGIN_SUCCESS: "Login successful",
@@ -55,5 +70,6 @@ export const MESSAGES = {
   SERVER_ERROR: "Internal server error",
   PROFILE_UPDATED: "Profile updated successfully",
   REPO_NOT_FOUND: "Repository not found",
+  REPO_CREATED: "Repo created Successfully"
 } as const; 
 

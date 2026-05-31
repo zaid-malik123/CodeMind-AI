@@ -4,7 +4,7 @@ interface IRepository extends Document {
   userId: mongoose.Types.ObjectId;
   githubUrl: string;
   repoName?: string;
-  status: "pending" | "cloning" | "chunking" | "embedding" | "ready" | "failed";
+  status: "pending" | "cloning" | "scanning" |"chunking" | "embedding" | "ready" | "failed";
   totalFiles: number;
   totalChunks: number;
   errorMessage?: string;
@@ -22,7 +22,7 @@ const repositorySchema = new mongoose.Schema<IRepository>(
     repoName: { type: String }, 
     status: {
       type: String,
-      enum: ["pending", "cloning", "chunking", "embedding", "ready", "failed"],
+      enum: ["pending", "cloning", "scanning", "chunking", "embedding", "ready", "failed"],
       default: "pending",
     },
     totalFiles: { type: Number, default: 0 },

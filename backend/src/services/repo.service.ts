@@ -1,4 +1,3 @@
-import User from "../models/user.model.js";
 import Repository from "../models/repo.model.js";
 import { repoProducer } from "../jobs/producer/repo.producer.js";
 
@@ -14,9 +13,9 @@ class RepoService {
 
         })
 
-        repoProducer(repo._id.toString())
+        await repoProducer(repo._id.toString())
 
-        return;
+        return repo;
 
     }
 }
