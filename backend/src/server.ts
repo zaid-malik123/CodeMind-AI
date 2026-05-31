@@ -6,18 +6,22 @@ import redis from "./config/redis.js";
 import { connectRabbitMQ } from "./config/rabbitmq.js";
 import { emailConsumer } from "./jobs/consumer/email.consumer.js";
 import { repoConsumer } from "./jobs/consumer/repo.consumer.js";
+import initSocketServer from "./socket/socket.js";
+import http from "http"
 
 
 const startServer = async () => {
   try {
-    
+    const server = http.createServer(app)
+    const io = initSocketServer(server)
+    logger.info("Socket server Initialized !! ")
     await connectDb();
     await redis.ping();
     await connectRabbitMQ();
     await emailConsumer()
     await repoConsumer()
 
-    app.listen(env.PORT, () => {
+    server.listen(env.PORT, () => {
       logger.info(`Server is running on port ${env.PORT}`);
     });
   } catch (error) {
