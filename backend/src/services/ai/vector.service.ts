@@ -25,19 +25,20 @@ export const saveEmbeddings = async (
         chunks[i].content
       );
      
+    if(embedding) {
 
-    vectors.push({
-      id: `${repoId}-${i}`,
-      values: embedding[0]!.values,
-      metadata: {
-        repoId,
-        filePath: chunks[i].filePath,
-        content: chunks[i].content
-      }
-    });
+      vectors.push({
+        id: `${repoId}-${i}`,
+        values: embedding[0].values,
+        metadata: {
+          repoId,
+          filePath: chunks[i].filePath,
+          content: chunks[i].content
+        }
+      });
+    }
   }
 
-  console.log("THIS IS THE VECTOR ", vectors)
 
   await index.upsert({records: vectors})
 };
