@@ -9,4 +9,6 @@ router.post("/create", authMiddleware, createRepoValidator, validateRequest, rep
 
 router.get("/my-repos", authMiddleware, repoController.getRepos)
 
+router.get("/status/:repoId", authMiddleware, repoController.repoStatus)
+
 export default router;

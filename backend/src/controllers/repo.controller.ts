@@ -42,7 +42,15 @@ class RepoController {
 
   repoStatus = asyncHandler(
     async (req: AuthenticatedRequest, res: Response) => {
-      const { repoId } = req.params;
+      const { repoId } = req.params as { repoId: string };
+
+      const userId = req.user!._id.toString();
+
+      const status = await repoService.getRepoStatus({ repoId, userId });
+
+      res
+        .status(HTTP_STATUS.OK)
+        .json(new ApiResponse(HTTP_STATUS.OK, MESSAGES.REPO_STATUS, status));
     },
   );
 }

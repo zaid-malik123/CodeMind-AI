@@ -72,5 +72,6 @@ export const MESSAGES = {
   REPO_NOT_FOUND: "Repository not found",
   REPO_CREATED: "Repo created Successfully",
   REPO_FETCHED: "Repos fetched successfully",
+  REPO_STATUS: "Repo status fetched successfully",
 } as const; 
 
