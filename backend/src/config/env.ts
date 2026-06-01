@@ -79,6 +79,12 @@ if(!process.env.VECTOR_DB_API_KEY) {
   );
 }
 
+if(!process.env.VECTOR_DB_HOST_NAME) {
+  console.warn(
+    "VECTOR_DB_HOST_NAME is not defined in environment variables. Vector database functionality may not work properly.",
+  );
+}
+
 export const env = {
   PORT: process.env.PORT || 5000,
   MONGO_URI: process.env.MONGO_URI,
@@ -105,5 +111,6 @@ export const env = {
 
   AI_API_KEY: process.env.AI_API_KEY,
   VECTOR_DB_API_KEY: process.env.VECTOR_DB_API_KEY,
+  VECTOR_DB_HOST_NAME: process.env.VECTOR_DB_HOST_NAME,
 };
   

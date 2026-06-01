@@ -11,4 +11,6 @@ router.get("/my-repos", authMiddleware, repoController.getRepos)
 
 router.get("/status/:repoId", authMiddleware, repoController.repoStatus)
 
+router.delete("/delete/:repoId", authMiddleware, repoController.deleteRepo)
+
 export default router;

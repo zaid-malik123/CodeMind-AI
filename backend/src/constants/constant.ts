@@ -73,5 +73,6 @@ export const MESSAGES = {
   REPO_CREATED: "Repo created Successfully",
   REPO_FETCHED: "Repos fetched successfully",
   REPO_STATUS: "Repo status fetched successfully",
+  REPO_DELETED: "Repo deleted successfully",
 } as const; 
 

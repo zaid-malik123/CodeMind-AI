@@ -1,6 +1,7 @@
 import pinecone from "../../config/vector.db.config.js";
 import { PINECONE_INDEX_NAME } from "../../constants/constant.js";
 import { generateEmbedding } from "./embedding.service.js";
+import { env } from "../../config/env.js";
 import pLimit from "p-limit";
 
 const limit = pLimit(5);
@@ -10,8 +11,8 @@ interface Chunk {
   content: string;
 }
 
+export const index = pinecone.index(PINECONE_INDEX_NAME, env.VECTOR_DB_HOST_NAME);
 export const saveEmbeddings = async (repoId: string, chunks: Chunk[]) => {
-  const index = pinecone.index(PINECONE_INDEX_NAME);
 
   const vectors = (
     await Promise.all(
