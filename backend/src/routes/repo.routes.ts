@@ -7,4 +7,6 @@ const router = express.Router();
 
 router.post("/create", authMiddleware, createRepoValidator, validateRequest, repoController.createRepo)
 
+router.get("/my-repos", authMiddleware, repoController.getRepos)
+
 export default router;
