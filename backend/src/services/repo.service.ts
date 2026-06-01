@@ -18,6 +18,11 @@ class RepoService {
         return repo;
 
     }
+
+    async getReposByUserId(userId: string) {
+        const repos = await Repository.find({ userId });
+        return repos;
+    }
 }
 
 export default new RepoService();

@@ -20,6 +20,18 @@ class RepoController {
         )        
 
     })
+
+    currentUserRepo = asyncHandler ( async (req: AuthenticatedRequest, res: Response) => {
+
+        const userId = req.user?._id.toString();
+
+        const repos = await repoService.getReposByUserId(userId!);
+
+        res.status(HTTP_STATUS.OK).json(
+            new ApiResponse(HTTP_STATUS.OK, MESSAGES.REPO_FETCHED, repos)
+        );
+
+    })
 }
 
 export default new RepoController();

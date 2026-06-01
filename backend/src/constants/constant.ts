@@ -70,6 +70,7 @@ export const MESSAGES = {
   SERVER_ERROR: "Internal server error",
   PROFILE_UPDATED: "Profile updated successfully",
   REPO_NOT_FOUND: "Repository not found",
-  REPO_CREATED: "Repo created Successfully"
+  REPO_CREATED: "Repo created Successfully",
+  REPO_FETCHED: "Repos fetched successfully",
 } as const; 
 
