@@ -1,5 +1,6 @@
 import Repository from "../models/repo.model.js";
 import { repoProducer } from "../jobs/producer/repo.producer.js";
+import { paginate } from "../utils/paginate.js";
 
 class RepoService {
   async createRepo({
@@ -23,25 +24,17 @@ class RepoService {
   }
 
   async getUserRepos(userId: string, page: number, limit: number) {
-    const skip = (page - 1) * limit;
-
-    const [repos, total] = await Promise.all([
-      Repository.find({ userId })
-        .sort({ createdAt: -1 })
-        .skip(skip)
-        .limit(limit),
-
-      Repository.countDocuments({ userId }),
-    ]);
+    
+    const { docs: repos, pagination } = await paginate({
+      model: Repository,
+      query: { userId },
+      page,
+      limit,
+    })
 
     return {
       repos,
-      pagination: {
-        page,
-        limit,
-        total,
-        totalPages: Math.ceil(total / limit),
-      },
+      pagination
     };
   }
   async getRepoStatus(repoId: string) {}
