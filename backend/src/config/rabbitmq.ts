@@ -11,8 +11,8 @@ export const connectRabbitMQ = async () => {
     connection = await amqplib.connect(env.RABBIT_URL!);
     channel = await connection.createChannel();
 
-    channel.assertQueue(RABBIT_QUEUES.EMAIL_QUEUE, { durable: true });
-    channel.assertQueue(RABBIT_QUEUES.REPOSITORY_QUEUE, { durable: true });
+    await channel.assertQueue(RABBIT_QUEUES.EMAIL_QUEUE, { durable: true });
+    await channel.assertQueue(RABBIT_QUEUES.REPOSITORY_QUEUE, { durable: true });
 
     await channel.assertQueue(RABBIT_QUEUES.REPOSITORY_RETRY_QUEUE, {
       durable: true,

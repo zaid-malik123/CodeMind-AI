@@ -8,8 +8,10 @@ export const repoConsumer = async () => {
 
   const channel = getChannel();
 
+  channel.prefetch(1);
+
   channel.consume(RABBIT_QUEUES.REPOSITORY_QUEUE, async (msg) => {
-    console.log("Received message from repository queue" , msg?.content.toString());
+
     if (!msg) {
       logger.warn("Received null message, skipping...");
       return;
