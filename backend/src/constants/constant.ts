@@ -1,4 +1,4 @@
-import { env } from "../config/env.js"
+import { env } from "../config/env.js";
 
 export const HTTP_STATUS = {
   OK: 200,
@@ -32,7 +32,7 @@ export const TOKEN_EXPIRATION = {
 export const AUTH_COOKIES = {
   ACCESS_TOKEN: "accessToken",
   REFRESH_TOKEN: "refreshToken",
-}
+};
 
 export const RABBIT_QUEUES = {
   EMAIL_QUEUE: "email_queue",
@@ -41,8 +41,8 @@ export const RABBIT_QUEUES = {
 
 export const SOCKER_EMMIT = {
   REPO_EMMIT: "repo-status",
-  SOCKET_ROOM_ID: "join-room"
-}
+  SOCKET_ROOM_ID: "join-room",
+};
 
 export const REPO_STATUS = {
   REPO_PENDING: "pending",
@@ -51,8 +51,8 @@ export const REPO_STATUS = {
   REPO_CHUNKING: "chunking",
   REPO_EMBEDDING: "embedding",
   REPO_READY: "ready",
-  REPO_FAILED: "failed"
-}
+  REPO_FAILED: "failed",
+} as const;
 
 export const MESSAGES = {
   USER_CREATED: "User created successfully",
@@ -74,5 +74,4 @@ export const MESSAGES = {
   REPO_FETCHED: "Repos fetched successfully",
   REPO_STATUS: "Repo status fetched successfully",
   REPO_DELETED: "Repo deleted successfully",
-} as const; 
-
+} as const;

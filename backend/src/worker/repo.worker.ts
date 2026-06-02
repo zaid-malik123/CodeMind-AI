@@ -16,14 +16,14 @@ export const repoWorker = async (repoId: string) => {
   try {
 
     emitRepoStatus(repoId, REPO_STATUS.REPO_CLONNING);
-    repo.status = "cloning";
+    repo.status = REPO_STATUS.REPO_CLONNING;
     await repo.save();
 
 
     const localPath = await cloneRepository(repo.githubUrl!, repoId);
 
     emitRepoStatus(repoId, REPO_STATUS.REPO_SCANNING);
-    repo.status = "scanning";
+    repo.status = REPO_STATUS.REPO_SCANNING;
     await repo.save();
 
     const filePaths = await scanRepository(localPath);
@@ -31,26 +31,26 @@ export const repoWorker = async (repoId: string) => {
     const files = await readRepositoryFiles(filePaths);
 
     emitRepoStatus(repoId, REPO_STATUS.REPO_CHUNKING);
-    repo.status = "chunking";
+    repo.status = REPO_STATUS.REPO_CHUNKING;
     repo.totalFiles = files.length;
     await repo.save();
 
     const chunks = createChunks(files);
 
     emitRepoStatus(repoId, REPO_STATUS.REPO_EMBEDDING);
-    repo.status = "embedding";
+    repo.status = REPO_STATUS.REPO_EMBEDDING;
     repo.totalChunks = chunks.length;
     await repo.save();
 
     await saveEmbeddings(repoId, chunks);
 
     emitRepoStatus(repoId, REPO_STATUS.REPO_READY);
-    repo.status = "ready";
+    repo.status = REPO_STATUS.REPO_READY;
     repo.indexedAt = new Date();
     await repo.save();
 
   } catch (error: any) {
-    repo.status = "failed";
+    repo.status = REPO_STATUS.REPO_FAILED;
     repo.errorMessage = error.message;
 
     await repo.save();
