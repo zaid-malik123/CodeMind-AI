@@ -8,62 +8,57 @@ import { scanRepository } from "../services/repository/scan.service.js";
 import { emitRepoStatus } from "../socket/socker.emit.js";
 
 export const repoWorker = async (repoId: string, retryCount: number) => {
+  const repo = await Repository.findById(repoId);
 
-  console.log(
-    "Repo worker started for repoId:",
-    repoId,
-    "Retry count:",
-    retryCount
-  );
+  if (!repo) {
+    throw new Error(MESSAGES.REPO_NOT_FOUND);
+  }
+  try {
+    repo.currentStep = REPO_STATUS.REPO_CLONNING;
+    emitRepoStatus(repoId, REPO_STATUS.REPO_CLONNING);
+    repo.status = REPO_STATUS.REPO_CLONNING;
+    await repo.save();
 
-  throw new Error("Testing Retry");
-  // const repo = await Repository.findById(repoId);
+    const localPath = await cloneRepository(repo.githubUrl!, repoId);
 
-  // if (!repo) {
-  //   throw new Error(MESSAGES.REPO_NOT_FOUND);
-  // }
-  // try {
+    repo.currentStep = REPO_STATUS.REPO_SCANNING;
+    emitRepoStatus(repoId, REPO_STATUS.REPO_SCANNING);
+    repo.status = REPO_STATUS.REPO_SCANNING;
+    await repo.save();
 
-  //   emitRepoStatus(repoId, REPO_STATUS.REPO_CLONNING);
-  //   repo.status = REPO_STATUS.REPO_CLONNING;
-  //   await repo.save();
+    const filePaths = await scanRepository(localPath);
 
+    const files = await readRepositoryFiles(filePaths);
 
-  //   const localPath = await cloneRepository(repo.githubUrl!, repoId);
+    repo.currentStep = REPO_STATUS.REPO_CHUNKING;
+    emitRepoStatus(repoId, REPO_STATUS.REPO_CHUNKING);
+    repo.status = REPO_STATUS.REPO_CHUNKING;
+    repo.totalFiles = files.length;
+    await repo.save();
 
-  //   emitRepoStatus(repoId, REPO_STATUS.REPO_SCANNING);
-  //   repo.status = REPO_STATUS.REPO_SCANNING;
-  //   await repo.save();
+    const chunks = createChunks(files);
 
-  //   const filePaths = await scanRepository(localPath);
+    repo.currentStep = REPO_STATUS.REPO_EMBEDDING;
+    emitRepoStatus(repoId, REPO_STATUS.REPO_EMBEDDING);
+    repo.status = REPO_STATUS.REPO_EMBEDDING;
+    repo.totalChunks = chunks.length;
+    await repo.save();
 
-  //   const files = await readRepositoryFiles(filePaths);
+    await saveEmbeddings(repoId, chunks);
 
-  //   emitRepoStatus(repoId, REPO_STATUS.REPO_CHUNKING);
-  //   repo.status = REPO_STATUS.REPO_CHUNKING;
-  //   repo.totalFiles = files.length;
-  //   await repo.save();
+    repo.currentStep = REPO_STATUS.REPO_READY;
+    emitRepoStatus(repoId, REPO_STATUS.REPO_READY);
+    repo.status = REPO_STATUS.REPO_READY;
+    repo.indexedAt = new Date();
+    await repo.save();
+  } catch (error: any) {
+    repo.currentStep = REPO_STATUS.REPO_FAILED;
+    repo.status = REPO_STATUS.REPO_FAILED;
+    repo.errorMessage = error.message;
 
-  //   const chunks = createChunks(files);
+    await repo.save();
 
-  //   emitRepoStatus(repoId, REPO_STATUS.REPO_EMBEDDING);
-  //   repo.status = REPO_STATUS.REPO_EMBEDDING;
-  //   repo.totalChunks = chunks.length;
-  //   await repo.save();
-
-  //   await saveEmbeddings(repoId, chunks);
-
-  //   emitRepoStatus(repoId, REPO_STATUS.REPO_READY);
-  //   repo.status = REPO_STATUS.REPO_READY;
-  //   repo.indexedAt = new Date();
-  //   await repo.save();
-
-  // } catch (error: any) {
-  //   repo.status = REPO_STATUS.REPO_FAILED;
-  //   repo.errorMessage = error.message;
-
-  //   await repo.save();
-
-  //   emitRepoStatus(repoId, REPO_STATUS.REPO_FAILED);
-  // }
+    emitRepoStatus(repoId, REPO_STATUS.REPO_FAILED);
+    throw error;
+  }
 };

@@ -7,6 +7,7 @@ interface IRepository extends Document {
   status: "pending" | "cloning" | "scanning" |"chunking" | "embedding" | "ready" | "failed";
   totalFiles: number;
   totalChunks: number;
+  currentStep?: string;
   errorMessage?: string;
   indexedAt?: Date;
 }
@@ -29,6 +30,7 @@ const repositorySchema = new mongoose.Schema<IRepository>(
     totalChunks: { type: Number, default: 0 },
     errorMessage: { type: String },
     indexedAt: { type: Date },
+    currentStep: { type: String },
   },
   { timestamps: true },
 );
