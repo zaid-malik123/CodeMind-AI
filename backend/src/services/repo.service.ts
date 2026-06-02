@@ -22,7 +22,7 @@ class RepoService {
       repoName,
     });
 
-    await repoProducer(repo._id.toString());
+    await repoProducer({  repoId: repo._id.toString(), retryCount: 0 });
 
     return repo;
   }

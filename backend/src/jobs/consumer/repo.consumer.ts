@@ -1,25 +1,77 @@
-import { getChannel } from "../../config/rabbitmq.js"
-import { RABBIT_QUEUES } from "../../constants/constant.js"
-import { logger } from "../../logger/logger.js"
-import { repoWorker } from "../../worker/repo.worker.js"
+import { getChannel } from "../../config/rabbitmq.js";
+import { RABBIT_QUEUES } from "../../constants/constant.js";
+import { logger } from "../../logger/logger.js";
+import { repoWorker } from "../../worker/repo.worker.js";
 
 export const repoConsumer = async () => {
+  logger.info("Repository consumer started, waiting for messages...");
 
-    logger.info("Repository consumer started, waiting for messages...")
+  const channel = getChannel();
 
-    const channel = getChannel()
+  channel.consume(RABBIT_QUEUES.REPOSITORY_QUEUE, async (msg) => {
+    console.log("Received message from repository queue" , msg?.content.toString());
+    if (!msg) {
+      logger.warn("Received null message, skipping...");
+      return;
+    }
 
-    channel.consume(RABBIT_QUEUES.REPOSITORY_QUEUE, async (msg) => {
+    const { repoId, retryCount } = JSON.parse(msg.content.toString());
 
-        if (msg) {
+    try {
 
-            const { repoId } = JSON.parse(msg.content.toString())
+      await repoWorker(repoId, retryCount);
+      channel.ack(msg);
 
-            repoWorker(repoId)
+    } 
+    catch (error: any) {
 
-            channel.ack(msg)
-        }
+      const nextRetry = retryCount + 1;
 
-    })
+      // DLQ
 
-}
+      if (nextRetry > 3) {
+        channel.sendToQueue(
+          RABBIT_QUEUES.REPOSITORY_DLQ,
+
+          Buffer.from(
+            JSON.stringify({
+              repoId,
+              retryCount: nextRetry,
+
+              error: error.message,
+            }),
+          ),
+
+          {
+            persistent: true,
+          },
+        );
+
+        logger.error(`Message moved to DLQ after ${retryCount} retries: ${error.message}`);
+
+        channel.ack(msg);
+
+        return;
+      }
+
+      // Retry Queue
+
+      channel.sendToQueue(
+        RABBIT_QUEUES.REPOSITORY_RETRY_QUEUE,
+
+        Buffer.from(
+          JSON.stringify({
+            repoId,
+            retryCount: nextRetry,
+          }),
+        ),
+
+        {
+          persistent: true,
+        },
+      );
+
+      channel.ack(msg);
+    }
+  });
+};

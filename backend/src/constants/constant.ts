@@ -37,6 +37,8 @@ export const AUTH_COOKIES = {
 export const RABBIT_QUEUES = {
   EMAIL_QUEUE: "email_queue",
   REPOSITORY_QUEUE: "repository_queue",
+  REPOSITORY_RETRY_QUEUE: "retry_queue",
+  REPOSITORY_DLQ: "dead_letter_queue",
 } as const;
 
 export const SOCKER_EMMIT = {

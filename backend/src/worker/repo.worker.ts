@@ -7,54 +7,63 @@ import { readRepositoryFiles } from "../services/repository/read.service.js";
 import { scanRepository } from "../services/repository/scan.service.js";
 import { emitRepoStatus } from "../socket/socker.emit.js";
 
-export const repoWorker = async (repoId: string) => {
-  const repo = await Repository.findById(repoId);
+export const repoWorker = async (repoId: string, retryCount: number) => {
 
-  if (!repo) {
-    throw new Error(MESSAGES.REPO_NOT_FOUND);
-  }
-  try {
+  console.log(
+    "Repo worker started for repoId:",
+    repoId,
+    "Retry count:",
+    retryCount
+  );
 
-    emitRepoStatus(repoId, REPO_STATUS.REPO_CLONNING);
-    repo.status = REPO_STATUS.REPO_CLONNING;
-    await repo.save();
+  throw new Error("Testing Retry");
+  // const repo = await Repository.findById(repoId);
+
+  // if (!repo) {
+  //   throw new Error(MESSAGES.REPO_NOT_FOUND);
+  // }
+  // try {
+
+  //   emitRepoStatus(repoId, REPO_STATUS.REPO_CLONNING);
+  //   repo.status = REPO_STATUS.REPO_CLONNING;
+  //   await repo.save();
 
 
-    const localPath = await cloneRepository(repo.githubUrl!, repoId);
+  //   const localPath = await cloneRepository(repo.githubUrl!, repoId);
 
-    emitRepoStatus(repoId, REPO_STATUS.REPO_SCANNING);
-    repo.status = REPO_STATUS.REPO_SCANNING;
-    await repo.save();
+  //   emitRepoStatus(repoId, REPO_STATUS.REPO_SCANNING);
+  //   repo.status = REPO_STATUS.REPO_SCANNING;
+  //   await repo.save();
 
-    const filePaths = await scanRepository(localPath);
+  //   const filePaths = await scanRepository(localPath);
 
-    const files = await readRepositoryFiles(filePaths);
+  //   const files = await readRepositoryFiles(filePaths);
 
-    emitRepoStatus(repoId, REPO_STATUS.REPO_CHUNKING);
-    repo.status = REPO_STATUS.REPO_CHUNKING;
-    repo.totalFiles = files.length;
-    await repo.save();
+  //   emitRepoStatus(repoId, REPO_STATUS.REPO_CHUNKING);
+  //   repo.status = REPO_STATUS.REPO_CHUNKING;
+  //   repo.totalFiles = files.length;
+  //   await repo.save();
 
-    const chunks = createChunks(files);
+  //   const chunks = createChunks(files);
 
-    emitRepoStatus(repoId, REPO_STATUS.REPO_EMBEDDING);
-    repo.status = REPO_STATUS.REPO_EMBEDDING;
-    repo.totalChunks = chunks.length;
-    await repo.save();
+  //   emitRepoStatus(repoId, REPO_STATUS.REPO_EMBEDDING);
+  //   repo.status = REPO_STATUS.REPO_EMBEDDING;
+  //   repo.totalChunks = chunks.length;
+  //   await repo.save();
 
-    await saveEmbeddings(repoId, chunks);
+  //   await saveEmbeddings(repoId, chunks);
 
-    emitRepoStatus(repoId, REPO_STATUS.REPO_READY);
-    repo.status = REPO_STATUS.REPO_READY;
-    repo.indexedAt = new Date();
-    await repo.save();
+  //   emitRepoStatus(repoId, REPO_STATUS.REPO_READY);
+  //   repo.status = REPO_STATUS.REPO_READY;
+  //   repo.indexedAt = new Date();
+  //   await repo.save();
 
-  } catch (error: any) {
-    repo.status = REPO_STATUS.REPO_FAILED;
-    repo.errorMessage = error.message;
+  // } catch (error: any) {
+  //   repo.status = REPO_STATUS.REPO_FAILED;
+  //   repo.errorMessage = error.message;
 
-    await repo.save();
+  //   await repo.save();
 
-    emitRepoStatus(repoId, REPO_STATUS.REPO_FAILED);
-  }
+  //   emitRepoStatus(repoId, REPO_STATUS.REPO_FAILED);
+  // }
 };

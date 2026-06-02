@@ -14,18 +14,33 @@ export const connectRabbitMQ = async () => {
     channel.assertQueue(RABBIT_QUEUES.EMAIL_QUEUE, { durable: true });
     channel.assertQueue(RABBIT_QUEUES.REPOSITORY_QUEUE, { durable: true });
 
+    await channel.assertQueue(RABBIT_QUEUES.REPOSITORY_RETRY_QUEUE, {
+      durable: true,
+
+      arguments: {
+        "x-message-ttl": 5000,
+
+        "x-dead-letter-exchange": "",
+
+        "x-dead-letter-routing-key": RABBIT_QUEUES.REPOSITORY_QUEUE,
+      },
+    });
+
+    await channel.assertQueue(RABBIT_QUEUES.REPOSITORY_DLQ, {
+      durable: true,
+    });
+
     logger.info("Connected to RabbitMQ");
-
-
   } catch (error) {
     logger.error("Error connecting to RabbitMQ:", error);
   }
 };
 
-
 export const getChannel = () => {
   if (!channel) {
-    throw new Error("RabbitMQ channel is not initialized. Call connectRabbitMQ first.");
+    throw new Error(
+      "RabbitMQ channel is not initialized. Call connectRabbitMQ first.",
+    );
   }
   return channel;
 };
