@@ -14,13 +14,10 @@ const initSocketServer = (server: http.Server) => {
   });
 
   io.on("connection", (socket) => {
-    logger.info(`Connected ${socket.id}`);
 
     socket.on(SOCKER_EMMIT.SOCKET_ROOM_ID, (repoId: string) => {
       socket.join(repoId);
 
-
-      logger.info(`${socket.id} joined room ${repoId}`);
     });
 
     socket.on("disconnect", () => {
