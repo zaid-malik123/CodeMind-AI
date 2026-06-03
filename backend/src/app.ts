@@ -8,6 +8,7 @@ import cookieParser from "cookie-parser";
 // routes import
 import userRoutes from "./routes/user.routes.js";
 import repoRoutes from "./routes/repo.routes.js";
+import chatRoutes from "./routes/chat.routes.js";
 
 
 const app = express();
@@ -23,6 +24,7 @@ app.use(cookieParser());
 // routes
 app.use("/api/user", userRoutes)
 app.use("/api/repo", repoRoutes)
+app.use("/api/chat", chatRoutes)
 
 
 
