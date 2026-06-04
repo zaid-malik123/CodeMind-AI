@@ -48,8 +48,8 @@ class ChatService {
       });
     }
 
-    const message = await Message.create({
-      chatId,
+    await Message.create({
+      chatId: chat._id,
       role: "user",
       content: question,
     });
@@ -73,12 +73,6 @@ class ChatService {
       },
     });
 
-    console.log(
-      results.matches.map((m) => ({
-        score: m.score,
-        filePath: m.metadata?.filePath,
-      })),
-    );
 
     const context = results.matches
       .map(
