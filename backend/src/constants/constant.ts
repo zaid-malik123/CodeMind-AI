@@ -76,4 +76,10 @@ export const MESSAGES = {
   REPO_FETCHED: "Repos fetched successfully",
   REPO_STATUS: "Repo status fetched successfully",
   REPO_DELETED: "Repo deleted successfully",
+  CHAT_CREATED: "Chat created successfully",
+  CHAT_NOT_FOUND: "Chat not found",
+  CHAT_FETCHED: "Chat fetched successfully",
+  CHAT_DELETED: "Chat deleted successfully",
+  EMBEDDING_GENERATION_FAILED: "Failed to generate embedding",
+  
 } as const;

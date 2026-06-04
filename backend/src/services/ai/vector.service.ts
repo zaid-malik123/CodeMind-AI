@@ -30,6 +30,7 @@ export const saveEmbeddings = async (repoId: string, chunks: Chunk[]) => {
             metadata: {
               repoId,
               filePath: chunk.filePath,
+              content: chunk.content,
             },
           };
         }),
@@ -37,23 +38,7 @@ export const saveEmbeddings = async (repoId: string, chunks: Chunk[]) => {
     )
   ).filter(Boolean);
 
-  console.log("Vectors generated:", vectors.length);
 
-  // for (let i = 0; i < chunks.length; i++) {
-  //   const embedding = await generateEmbedding(chunks[i].content);
-
-  //   if (embedding) {
-  //     vectors.push({
-  //       id: `${repoId}-${i}`,
-  //       values: embedding[0].values,
-  //       metadata: {
-  //         repoId,
-  //         filePath: chunks[i].filePath,
-  //         content: chunks[i].content,
-  //       },
-  //     });
-  //   }
-  // }
 
   await index.upsert({ records: vectors });
 };
