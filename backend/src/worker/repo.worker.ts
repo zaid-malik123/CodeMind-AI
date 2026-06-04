@@ -6,6 +6,7 @@ import { cloneRepository } from "../services/repository/clone.service.js";
 import { readRepositoryFiles } from "../services/repository/read.service.js";
 import { scanRepository } from "../services/repository/scan.service.js";
 import { emitRepoStatus } from "../socket/socker.emit.js";
+import fs from "fs/promises"
 
 export const repoWorker = async (repoId: string, retryCount: number) => {
   const repo = await Repository.findById(repoId);
@@ -51,6 +52,9 @@ export const repoWorker = async (repoId: string, retryCount: number) => {
     repo.status = REPO_STATUS.REPO_READY;
     repo.indexedAt = new Date();
     await repo.save();
+
+    fs.rm(localPath, { recursive: true, force: true });
+
   } catch (error: any) {
     repo.currentStep = REPO_STATUS.REPO_FAILED;
     repo.status = REPO_STATUS.REPO_FAILED;
