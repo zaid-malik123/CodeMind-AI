@@ -3,6 +3,7 @@ import Chat from "../models/chat.model.js";
 import Message from "../models/message.model.js";
 import User from "../models/user.model.js";
 import ApiError from "../utils/ApiError.js";
+import { paginate } from "../utils/paginate.js";
 import { generateChatTitle } from "./ai/ai.generation.chatTitle.service.js";
 import { sendAIResponse } from "./ai/ai.response.service.js";
 import { generateEmbedding } from "./ai/embedding.service.js";
@@ -101,6 +102,19 @@ ${match.metadata?.content}
     });
 
     return chat;
+  }
+
+  async getAllChatsService(userId: string) {
+
+    const chats = await paginate({
+      model: Chat,
+      filter: { userId },
+      page: 1,
+      limit: 10,
+      sort: { createdAt: -1 },
+    });
+
+    return chats;
   }
 }
 

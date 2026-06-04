@@ -24,6 +24,19 @@ class chatController {
         .json(new ApiResponse(HTTP_STATUS.OK, MESSAGES.CHAT_CREATED, chat));
     },
   );
+
+  getAllChatsController = asyncHandler(
+    async (req: AuthenticatedRequest, res: Response) => {
+      const userId = req.user!._id.toString();
+
+      const chats = await chatService.getAllChatsService(userId);
+
+      res
+        .status(HTTP_STATUS.OK)
+        .json(new ApiResponse(HTTP_STATUS.OK, MESSAGES.CHAT_FETCHED, chats));
+
+    }
+  )
 }
 
 export default new chatController();
