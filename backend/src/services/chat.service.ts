@@ -4,6 +4,7 @@ import Message from "../models/message.model.js";
 import User from "../models/user.model.js";
 import ApiError from "../utils/ApiError.js";
 import { generateChatTitle } from "./ai/ai.generation.chatTitle.service.js";
+import { sendAIResponse } from "./ai/ai.response.service.js";
 import { generateEmbedding } from "./ai/embedding.service.js";
 import { index } from "./ai/vector.service.js";
 
@@ -55,7 +56,6 @@ class ChatService {
 
     const embedding = await generateEmbedding(question);
     const vectors = embedding![0].values as number[];
-    console.log("Vectors: ", vectors);
 
     if (!embedding) {
       throw new ApiError(
@@ -73,7 +73,38 @@ class ChatService {
       },
     });
 
-    console.log(JSON.stringify(results, null, 2));
+    console.log(
+      results.matches.map((m) => ({
+        score: m.score,
+        filePath: m.metadata?.filePath,
+      })),
+    );
+
+    const context = results.matches
+      .map(
+        (match) => `
+File: ${match.metadata?.filePath}
+
+${match.metadata?.content}
+`,
+      )
+      .join("\n\n-------------------\n\n");
+
+    const fileRefs = results.matches.map((match) => ({
+      filePath: String(match.metadata?.filePath),
+    }));
+
+    const aiResponse = await sendAIResponse({
+      question,
+      context,
+    });
+
+    await Message.create({
+      chatId: chat._id,
+      role: "assistant",
+      content: aiResponse,
+      fileRefs,
+    });
 
     return chat;
   }
