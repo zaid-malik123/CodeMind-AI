@@ -1,3 +1,4 @@
+import mongoose from "mongoose";
 import { HTTP_STATUS, MESSAGES } from "../constants/constant.js";
 import Chat from "../models/chat.model.js";
 import Message from "../models/message.model.js";
@@ -74,7 +75,6 @@ class ChatService {
       },
     });
 
-
     const context = results.matches
       .map(
         (match) => `
@@ -105,7 +105,6 @@ ${match.metadata?.content}
   }
 
   async getAllChatsService(userId: string) {
-
     const chats = await paginate({
       model: Chat,
       filter: { userId },
@@ -115,6 +114,52 @@ ${match.metadata?.content}
     });
 
     return chats;
+  }
+
+  async getSingleChatMessagesService(userId: string, chatId: string) {
+    const messages = await Message.aggregate([
+      {
+        $match: {
+          chatId: new mongoose.Types.ObjectId(chatId),
+        },
+      },
+
+      {
+        $lookup: {
+          from: "chats",
+          localField: "chatId",
+          foreignField: "_id",
+          as: "chat",
+        },
+      },
+
+      {
+        $unwind: "$chat",
+      },
+
+      {
+        $match: {
+          "chat.userId": new mongoose.Types.ObjectId(userId),
+        },
+      },
+
+      {
+        $project: {
+          _id: 1,
+          chatId: 1,
+          role: 1,
+          content: 1,
+        },
+      },
+
+      {
+        $sort: {
+          createdAt: 1,
+        },
+      }
+    ]);
+
+    return messages;
   }
 }
 

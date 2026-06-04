@@ -37,6 +37,21 @@ class chatController {
 
     }
   )
+
+  getSingleChatMessagesController = asyncHandler(
+    async (req: AuthenticatedRequest, res: Response) => {
+
+      const userId = req.user!._id.toString();
+      const chatId = req.params.chatId as string;
+
+      const messages = await chatService.getSingleChatMessagesService(userId, chatId);
+
+      res
+        .status(HTTP_STATUS.OK)
+        .json(new ApiResponse(HTTP_STATUS.OK, MESSAGES.CHAT_MESSAGES_FETCHED, messages));
+
+    }
+  )
 }
 
 export default new chatController();

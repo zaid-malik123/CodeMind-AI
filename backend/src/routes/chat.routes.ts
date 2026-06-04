@@ -20,4 +20,10 @@ router.get(
     chatController.getAllChatsController
 )
 
+router.get(
+    "/:chatId/messages",
+    authMiddleware,
+    chatController.getSingleChatMessagesController
+)
+
 export default router;
