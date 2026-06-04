@@ -52,6 +52,19 @@ class chatController {
 
     }
   )
+
+  chatDeleteController = asyncHandler(
+    async (req: AuthenticatedRequest, res: Response) => {
+      const userId = req.user!._id.toString();
+      const chatId = req.params.chatId as string;
+
+      await chatService.deleteChatService(userId, chatId);
+
+      res
+        .status(HTTP_STATUS.OK)
+        .json(new ApiResponse(HTTP_STATUS.OK, MESSAGES.CHAT_DELETED));
+    }
+  )
 }
 
 export default new chatController();

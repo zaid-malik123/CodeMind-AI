@@ -161,6 +161,25 @@ ${match.metadata?.content}
 
     return messages;
   }
+
+  async deleteChatService(userId: string, chatId: string) {
+    
+    const chat = await Chat.findById(chatId);
+
+    if (!chat) {
+      throw new ApiError(HTTP_STATUS.NOT_FOUND, MESSAGES.CHAT_NOT_FOUND);
+    }
+
+    if (chat.userId.toString() !== userId) {
+      throw new ApiError(HTTP_STATUS.UNAUTHORIZED, MESSAGES.UNAUTHORIZED);
+    }
+
+    await Message.deleteMany({ chatId });
+    await Chat.findByIdAndDelete(chatId);
+
+    return;
+
+  }
 }
 
 export default new ChatService();
