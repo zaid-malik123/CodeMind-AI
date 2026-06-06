@@ -44,6 +44,9 @@ export const RABBIT_QUEUES = {
 export const SOCKER_EMMIT = {
   REPO_EMMIT: "repo-status",
   SOCKET_ROOM_ID: "join-room",
+  SOCKET_CHAT_ROOM_ID: "chat-room",
+  ASK_QUESETION: "ask-question",
+  AI_RESPONSE: "ai-response"
 };
 
 export const REPO_STATUS = {

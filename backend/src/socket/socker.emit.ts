@@ -17,3 +17,14 @@ export const emitRepoStatus = (
     )
 
 }
+
+export const aiResponseMessageEmit = (chatId: string, response: any) => {
+
+    const io = getIo();
+
+    io.to(`chat:${chatId}`).emit(
+        SOCKER_EMMIT.AI_RESPONSE, 
+        response
+    )
+
+}

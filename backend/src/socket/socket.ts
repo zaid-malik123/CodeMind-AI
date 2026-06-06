@@ -20,6 +20,13 @@ const initSocketServer = (server: http.Server) => {
 
     });
 
+    socket.on(SOCKER_EMMIT.SOCKET_CHAT_ROOM_ID, (chatId: string) => {
+
+      socket.join(`chat:${chatId}`)
+
+    })
+
+
     socket.on("disconnect", () => {
       logger.info(`Disconnected ${socket.id}`);
     });
