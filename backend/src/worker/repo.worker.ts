@@ -53,7 +53,7 @@ export const repoWorker = async (repoId: string, retryCount: number) => {
     repo.indexedAt = new Date();
     await repo.save();
 
-    fs.rm(localPath, { recursive: true, force: true });
+    await fs.rm(localPath, { recursive: true, force: true });
 
   } catch (error: any) {
     repo.currentStep = REPO_STATUS.REPO_FAILED;
