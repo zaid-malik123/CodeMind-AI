@@ -48,7 +48,7 @@ class RepoService {
       throw new ApiError(HTTP_STATUS.NOT_FOUND, MESSAGES.REPO_NOT_FOUND);
     }
 
-    return repo;
+    return repo.status;
   }
 
   async deleteRepo({ repoId, userId }: { repoId: string; userId: string }) {
