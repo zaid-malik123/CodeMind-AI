@@ -85,5 +85,6 @@ export const MESSAGES = {
   CHAT_DELETED: "Chat deleted successfully",
   EMBEDDING_GENERATION_FAILED: "Failed to generate embedding",
   CHAT_MESSAGES_FETCHED: "Chat messages fetched successfully",
+  SOCKET_AUTHENTICATION_FAILED: "socket authentication failed"
   
 } as const;
