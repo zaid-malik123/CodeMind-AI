@@ -9,6 +9,7 @@ import { generateChatTitle } from "./ai/ai.generation.chatTitle.service.js";
 import { sendAIResponse } from "./ai/ai.response.service.js";
 import { generateEmbedding } from "./ai/embedding.service.js";
 import { index } from "./ai/vector.service.js";
+import { aiResponseMessageEmit } from "../socket/socker.emit.js";
 
 class ChatService {
   async createChatService({
@@ -50,11 +51,13 @@ class ChatService {
       });
     }
 
-    await Message.create({
+     await Message.create({
       chatId: chat._id,
       role: "user",
       content: question,
     });
+
+
 
     const embedding = await generateEmbedding(question);
     const vectors = embedding![0].values as number[];
@@ -94,12 +97,14 @@ ${match.metadata?.content}
       context,
     });
 
-    await Message.create({
+    const aiMessage = await Message.create({
       chatId: chat._id,
       role: "assistant",
       content: aiResponse,
       fileRefs,
     });
+
+    await aiResponseMessageEmit(chat._id.toString(), aiMessage)
 
     return chat;
   }
