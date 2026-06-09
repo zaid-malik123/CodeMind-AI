@@ -1,9 +1,14 @@
-import React from 'react'
+import Footer from "@/components/Footer";
+import Landing from "@/components/Landing";
+import Nav from "@/components/Nav";
+import React from "react";
 
 const page = () => {
-  return (
-    <div>page</div>
-  )
-}
+  return <div>
+    <Nav/>
+    <Landing /> 
+    <Footer />
+  </div>;
+};
 
-export default page
+export default page;
