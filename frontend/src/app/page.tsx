@@ -1,3 +1,4 @@
+import ExampleQuestions from "@/components/ExampleQuestions";
 import Footer from "@/components/Footer";
 import Landing from "@/components/Landing";
 import Nav from "@/components/Nav";
@@ -7,6 +8,7 @@ const page = () => {
   return <div>
     <Nav/>
     <Landing /> 
+    <ExampleQuestions />
     <Footer />
   </div>;
 };

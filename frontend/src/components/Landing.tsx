@@ -20,7 +20,7 @@ const Landing = () => {
           and understand complex codebases instantly.
         </p>
 
-        <div className="mt-10 flex flex-col gap-4 sm:flex-row">
+        <div className="mt-10 flex gap-4 sm:flex-row">
           <Link
             href="/register"
             className="rounded-xl bg-primary px-6 py-3 font-medium text-primary-foreground transition hover:opacity-90"
