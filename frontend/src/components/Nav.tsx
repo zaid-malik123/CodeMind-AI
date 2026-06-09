@@ -3,6 +3,9 @@
 import Link from "next/link";
 // import { useTheme } from "@/hooks/useTheme";
 import { useAuth } from "@/hooks/useAuth";
+import { IoMoonOutline } from "react-icons/io5";
+import { IoSunnyOutline } from "react-icons/io5";
+
 
 const Nav = () => {
 //   const { theme, toggleTheme } = useTheme();
@@ -30,6 +33,7 @@ const Nav = () => {
             // onClick={toggleTheme}
             className="flex h-10 w-10 items-center justify-center rounded-lg border border-border bg-card transition hover:opacity-80"
           >
+            <IoMoonOutline size={18} />
             {/* {theme === "dark" ? "☀️" : "🌙"} */}
           </button>
 
