@@ -5,10 +5,11 @@ import Link from "next/link";
 import { useAuth } from "@/hooks/useAuth";
 import { IoMoonOutline } from "react-icons/io5";
 import { IoSunnyOutline } from "react-icons/io5";
+import { useTheme } from "@/hooks/useTheme";
 
 
 const Nav = () => {
-//   const { theme, toggleTheme } = useTheme();
+  const { theme, toggleTheme } = useTheme();
   const { user } = useAuth();
 
   return (
@@ -30,11 +31,11 @@ const Nav = () => {
         <div className="flex items-center gap-3">
           {/* Theme Toggle */}
           <button
-            // onClick={toggleTheme}
+            onClick={toggleTheme}
             className="flex h-10 w-10 items-center justify-center rounded-lg border border-border bg-card transition hover:opacity-80"
           >
-            <IoMoonOutline size={18} />
-            {/* {theme === "dark" ? "☀️" : "🌙"} */}
+            
+            {theme === "dark" ? <IoSunnyOutline color="white" size={18} /> : <IoMoonOutline size={18} />}
           </button>
 
           {/* Auth */}

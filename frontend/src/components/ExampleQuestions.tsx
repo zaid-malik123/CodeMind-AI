@@ -11,10 +11,22 @@ const ExampleQuestions = () => {
   ];
 
   return (
-    <section className="px-6 py-10">
+    <section className="px-6 py-10 bg-background">
       <div className="mx-auto max-w-7xl">
         <div className="text-center">
-          <span className="rounded-full border border-border bg-card px-4 py-2 text-sm text-muted-foreground">
+          <span
+            className="
+    rounded-full
+    border
+    border-primary/20
+    bg-primary/10
+    px-4
+    py-2
+    text-sm
+    font-medium
+    text-primary
+  "
+          >
             Example Questions
           </span>
 
@@ -23,8 +35,8 @@ const ExampleQuestions = () => {
           </h2>
 
           <p className="mx-auto mt-4 max-w-2xl text-muted-foreground">
-            Explore repositories using natural language. Here are some
-            examples of what you can ask.
+            Explore repositories using natural language. Here are some examples
+            of what you can ask.
           </p>
         </div>
 
@@ -32,12 +44,45 @@ const ExampleQuestions = () => {
           {questions.map((question) => (
             <div
               key={question}
-              className="group cursor-pointer rounded-2xl border border-border bg-card p-5 transition-all duration-200 hover:border-primary hover:shadow-lg"
+              className="
+    group
+    cursor-pointer
+    rounded-2xl
+    border
+    border-border
+    bg-card
+    p-5
+    transition-all
+    duration-300
+    hover:border-primary
+    hover:-translate-y-1
+  "
             >
-              <div className="flex items-center gap-3">
-                <span className="text-lg">💬</span>
+              <div className="flex items-start gap-4">
+                <div
+                  className="
+        flex
+        h-10
+        w-10
+        shrink-0
+        items-center
+        justify-center
+        rounded-xl
+        bg-primary/10
+        text-primary
+      "
+                >
+                  💬
+                </div>
 
-                <p className="font-medium text-card-foreground">
+                <p
+                  className="
+        font-medium
+        text-card-foreground
+        transition-colors
+        group-hover:text-primary
+      "
+                >
                   {question}
                 </p>
               </div>
