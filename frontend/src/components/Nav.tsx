@@ -6,13 +6,24 @@ import { useAuth } from "@/hooks/useAuth";
 import { IoMoonOutline } from "react-icons/io5";
 import { IoSunnyOutline } from "react-icons/io5";
 import { useTheme } from "@/hooks/useTheme";
+import { useRouter } from "next/navigation";
+import AuthModal from "./AuthModal";
 
+type propsType = {
+  authModalOpen: boolean;
+  setAuthModalOpen: React.Dispatch<
+    React.SetStateAction<boolean>
+  >;
+};
 
-const Nav = () => {
+const Nav = ({authModalOpen, setAuthModalOpen}: propsType) => {
   const { theme, toggleTheme } = useTheme();
   const { user } = useAuth();
+  const router = useRouter()
 
   return (
+    <>
+    
     <nav className="sticky top-0 z-50 border-b border-border bg-background/80 backdrop-blur">
       <div className="mx-auto flex h-16 max-w-7xl items-center justify-between px-6">
         {/* Logo */}
@@ -44,16 +55,21 @@ const Nav = () => {
               {user.name?.charAt(0).toUpperCase()}
             </button>
           ) : (
-            <Link
-              href="/login"
+            <button
+              onClick={() => setAuthModalOpen(true)}
               className="rounded-lg bg-primary px-4 py-2 font-medium text-primary-foreground transition hover:opacity-90"
             >
               Login
-            </Link>
+            </button>
           )}
         </div>
       </div>
     </nav>
+
+    <AuthModal authModalOpen={authModalOpen} setAuthModalOpen={setAuthModalOpen} />
+    </>
+
+
   );
 };
 

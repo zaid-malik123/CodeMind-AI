@@ -2,8 +2,9 @@ import PublicHome from "@/components/PublicHome";
 
 
 const page = () => {
-  return <div>
-   <PublicHome />
+
+  return <div className="min-h-screen w-full relative">
+   <PublicHome  />
   </div>;
 };
 
