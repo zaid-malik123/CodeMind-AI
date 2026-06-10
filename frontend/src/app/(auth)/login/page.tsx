@@ -1,12 +1,9 @@
-import LoginModal from '@/components/AuthModal'
 import React from 'react'
 
-const Login = () => {
+const page = () => {
   return (
-    <div className='min-h-screen w-full bg-gray-100'>
-      <LoginModal />
-    </div>
+    <div>page</div>
   )
 }
 
-export default Login
+export default page

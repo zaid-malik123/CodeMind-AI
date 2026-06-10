@@ -8,13 +8,28 @@ type propsType = {
   setAuthModalOpen: React.Dispatch<React.SetStateAction<boolean>>;
 };
 
-const AuthModal = ({ authModalOpen, setAuthModalOpen }: propsType) => {
-  const [activeModal, setActiveModal] = useState<activeModalType>("login");
+const AuthModal = ({
+  authModalOpen,
+  setAuthModalOpen,
+}: propsType) => {
+  const [activeModal, setActiveModal] =
+    useState<activeModalType>("login");
 
-  return <>{activeModal === "login" ? <div className="w-full h-full  bg-black/60 fixed inset-0 z-50 backdrop-blur-sm">
+  if (!authModalOpen) return null;
 
-  </div> : <div>
-    </div>}</>;
+  return (
+    <div className="fixed inset-0 z-50 bg-black/60 backdrop-blur-sm">
+      {activeModal === "login" ? (
+        <div>
+          Login Modal
+        </div>
+      ) : (
+        <div>
+          Signup Modal
+        </div>
+      )}
+    </div>
+  );
 };
 
 export default AuthModal;
