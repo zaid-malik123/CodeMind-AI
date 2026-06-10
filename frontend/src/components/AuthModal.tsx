@@ -4,6 +4,9 @@ import React, { useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import { FcGoogle } from "react-icons/fc";
 import { IoClose } from "react-icons/io5";
+import { useForm } from "react-hook-form";
+import { loginSchema, registerSchema } from "../validation/auth.validation";
+import { zodResolver } from "@hookform/resolvers/zod";
 
 type ActiveModalType = "login" | "signup";
 
@@ -12,12 +15,27 @@ type PropsType = {
   setAuthModalOpen: React.Dispatch<React.SetStateAction<boolean>>;
 };
 
-const AuthModal = ({
-  authModalOpen,
-  setAuthModalOpen,
-}: PropsType) => {
-  const [activeModal, setActiveModal] =
-    useState<ActiveModalType>("login");
+interface formData {
+  name?: string;
+  email: string;
+  password: string;
+}
+
+const AuthModal = ({ authModalOpen, setAuthModalOpen }: PropsType) => {
+  const [activeModal, setActiveModal] = useState<ActiveModalType>("login");
+
+  const schema = activeModal === "login" ? loginSchema : registerSchema;
+
+  const { register, handleSubmit, reset, formState: {
+    errors,
+    isSubmitting
+  } } = useForm<formData>({
+    resolver: zodResolver(schema),
+  });
+
+  const submit = (data: formData) => {
+    console.log(data);
+  };
 
   return (
     <AnimatePresence>
@@ -63,9 +81,7 @@ const AuthModal = ({
             {/* Header */}
             <div className="mb-8 text-center">
               <h2 className="text-3xl font-bold text-card-foreground">
-                {activeModal === "login"
-                  ? "Welcome Back"
-                  : "Create Account"}
+                {activeModal === "login" ? "Welcome Back" : "Create Account"}
               </h2>
 
               <p className="mt-2 text-sm text-muted-foreground">
@@ -78,9 +94,7 @@ const AuthModal = ({
             {/* Tabs */}
             <div className="mb-6 flex rounded-xl bg-muted p-1">
               <button
-                onClick={() =>
-                  setActiveModal("login")
-                }
+                onClick={() => setActiveModal("login")}
                 className={`flex-1 rounded-lg py-2.5 text-sm font-medium transition-all ${
                   activeModal === "login"
                     ? "bg-primary text-primary-foreground shadow-sm"
@@ -91,9 +105,7 @@ const AuthModal = ({
               </button>
 
               <button
-                onClick={() =>
-                  setActiveModal("signup")
-                }
+                onClick={() => setActiveModal("signup")}
                 className={`flex-1 rounded-lg py-2.5 text-sm font-medium transition-all ${
                   activeModal === "signup"
                     ? "bg-primary text-primary-foreground shadow-sm"
@@ -105,41 +117,77 @@ const AuthModal = ({
             </div>
 
             {/* Form */}
-            <div className="space-y-4">
+            <form onSubmit={handleSubmit(submit)} className="space-y-4">
               {activeModal === "signup" && (
-                <input
-                  type="text"
-                  placeholder="Full Name"
-                  className="w-full rounded-xl border border-border bg-background px-4 py-3 text-foreground outline-none transition-colors placeholder:text-muted-foreground focus:border-primary"
-                />
+                <div>
+                  <input
+                    {...register("name")}
+                    type="text"
+                    placeholder="Full Name"
+                    className="w-full rounded-xl border border-border bg-background px-4 py-3 text-foreground outline-none focus:border-primary"
+                  />
+
+                  {errors.name && (
+                    <p className="mt-1 text-sm text-red-500">
+                      {errors.name.message}
+                    </p>
+                  )}
+                </div>
               )}
 
-              <input
-                type="email"
-                placeholder="Email Address"
-                className="w-full rounded-xl border border-border bg-background px-4 py-3 text-foreground outline-none transition-colors placeholder:text-muted-foreground focus:border-primary"
-              />
+              <div>
+                <input
+                  {...register("email")}
+                  type="email"
+                  placeholder="Email Address"
+                  className="w-full rounded-xl border border-border bg-background px-4 py-3 text-foreground outline-none focus:border-primary"
+                />
 
-              <input
-                type="password"
-                placeholder="Password"
-                className="w-full rounded-xl border border-border bg-background px-4 py-3 text-foreground outline-none transition-colors placeholder:text-muted-foreground focus:border-primary"
-              />
+                {errors.email && (
+                  <p className="mt-1 text-sm text-red-500">
+                    {errors.email.message}
+                  </p>
+                )}
+              </div>
+
+              <div>
+                <input
+                  {...register("password")}
+                  type="password"
+                  placeholder="Password"
+                  className="w-full rounded-xl border border-border bg-background px-4 py-3 text-foreground outline-none focus:border-primary"
+                />
+
+                {errors.password && (
+                  <p className="mt-1 text-sm text-red-500">
+                    {errors.password.message}
+                  </p>
+                )}
+              </div>
 
               {activeModal === "login" && (
                 <div className="flex justify-end">
-                  <button className="text-sm text-primary hover:underline">
+                  <button
+                    type="button"
+                    className="text-sm text-primary hover:underline"
+                  >
                     Forgot Password?
                   </button>
                 </div>
               )}
 
-              <button className="w-full rounded-xl bg-primary py-3 font-semibold text-primary-foreground transition-opacity hover:opacity-90">
-                {activeModal === "login"
-                  ? "Login"
-                  : "Create Account"}
+              <button
+                type="submit"
+                disabled={isSubmitting}
+                className="w-full rounded-xl bg-primary py-3 font-semibold text-primary-foreground disabled:opacity-50"
+              >
+                {isSubmitting
+                  ? "Loading..."
+                  : activeModal === "login"
+                    ? "Login"
+                    : "Create Account"}
               </button>
-            </div>
+            </form>
 
             {/* Divider */}
             <div className="my-6 flex items-center gap-3">
@@ -166,17 +214,11 @@ const AuthModal = ({
 
               <button
                 onClick={() =>
-                  setActiveModal(
-                    activeModal === "login"
-                      ? "signup"
-                      : "login"
-                  )
+                  setActiveModal(activeModal === "login" ? "signup" : "login")
                 }
                 className="ml-2 font-semibold text-primary hover:underline"
               >
-                {activeModal === "login"
-                  ? "Sign Up"
-                  : "Login"}
+                {activeModal === "login" ? "Sign Up" : "Login"}
               </button>
             </div>
           </motion.div>
