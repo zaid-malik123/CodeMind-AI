@@ -27,7 +27,7 @@ export const COOKIE_EXPIRATION = {
 export const TOKEN_EXPIRATION = {
   ACCESS_TOKEN: "15m",
   REFRESH_TOKEN: "7d",
-  EMAIL_VERIFICATION_TOKEN_EXPIRATION: "60"
+  EMAIL_VERIFICATION_TOKEN_EXPIRATION: "3600"
 } as const;
 
 export const AUTH_COOKIES = {
@@ -68,6 +68,7 @@ export const MESSAGES = {
   USER_DOES_NOT_EXIST: "User does not exist please register",
   USER_FETCHED: "User fetched successfully",
   LOGOUT_SUCCESS: "Logout successful",
+  USER_VERIFIED_SUCCESSFULLY: "User verified Successfully",
   MESSAGE_OTP_SENT: "OTP sent to email successfully",
   INVALID_OTP: "Invalid OTP",
   PASSWORD_RESET_SUCCESS: "Password reset successful",
@@ -87,6 +88,8 @@ export const MESSAGES = {
   CHAT_DELETED: "Chat deleted successfully",
   EMBEDDING_GENERATION_FAILED: "Failed to generate embedding",
   CHAT_MESSAGES_FETCHED: "Chat messages fetched successfully",
-  SOCKET_AUTHENTICATION_FAILED: "socket authentication failed"
+  SOCKET_AUTHENTICATION_FAILED: "socket authentication failed",
+  INVALID_AND_EXPIRED_TOKEN: "Invalid or expired token",
+  USER_ALREADY_VERIFIED: "user already verified"
   
 } as const;

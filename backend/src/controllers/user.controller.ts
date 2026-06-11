@@ -36,6 +36,16 @@ class UserController {
       .json(new ApiResponse(HTTP_STATUS.OK, MESSAGES.LOGIN_SUCCESS, user));
   });
 
+  verifyUser = asyncHandler ( async ( req, res) => {
+
+    const { token } = req.params;
+
+    await userService.verifyUser(token as string)
+
+    return res.status(HTTP_STATUS.OK).json( new ApiResponse(HTTP_STATUS.OK, MESSAGES.USER_VERIFIED_SUCCESSFULLY))
+
+  })
+
   logoutUser = asyncHandler(async (req: AuthenticatedRequest, res) => {
     const userId = req.user?._id.toString();
 

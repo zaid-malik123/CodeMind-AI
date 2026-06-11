@@ -36,6 +36,11 @@ router.post(
   UserController.generateNewAccessToken,
 );
 
+router.get(
+  "/verify-user/:token",
+  UserController.verifyUser
+)
+
 router.post(
   "/forgot-password",
   forgotPasswordValidator,

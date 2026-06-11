@@ -63,6 +63,34 @@ class UserService {
     return user;
   }
 
+  async verifyUser(token: string) {
+    const userId = await redisService.getEmailVerificationToken(token);
+
+    if (!userId) {
+      throw new ApiError(
+        HTTP_STATUS.BAD_REQUEST,
+        MESSAGES.INVALID_AND_EXPIRED_TOKEN,
+      );
+    }
+
+    const user = await User.findById(userId);
+
+    if(!user) {
+      throw new ApiError(HTTP_STATUS.NOT_FOUND, MESSAGES.USER_DOES_NOT_EXIST)
+    }
+
+    if(user.isVerified) {
+      throw new ApiError(HTTP_STATUS.BAD_REQUEST, MESSAGES.USER_ALREADY_VERIFIED)
+    }
+
+    user.isVerified = true;
+
+    await user.save();
+
+    return;
+    
+  }
+
   async refreshToken(refreshToken: string) {
     if (!refreshToken) {
       throw new ApiError(HTTP_STATUS.UNAUTHORIZED, MESSAGES.UNAUTHORIZED);
