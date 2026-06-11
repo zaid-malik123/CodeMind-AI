@@ -8,6 +8,7 @@ import { emailConsumer } from "./jobs/consumer/email.consumer.js";
 import { repoConsumer } from "./jobs/consumer/repo.consumer.js";
 import initSocketServer from "./socket/socket.js";
 import http from "http"
+import { verifyEmailConsumer } from "./jobs/consumer/verifyEmail.consumer.js";
 
 
 const startServer = async () => {
@@ -19,6 +20,7 @@ const startServer = async () => {
     await redis.ping();
     await connectRabbitMQ();
     await emailConsumer()
+    await verifyEmailConsumer();
     await repoConsumer()
 
     server.listen(env.PORT, () => {

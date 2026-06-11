@@ -8,6 +8,9 @@ import { generateAuthTokens } from "../utils/auth.utils.js";
 import { generateOtp } from "../utils/generateOtp.js";
 import { emailProducer } from "../jobs/producer/email.producer.js";
 import { uploadOnCloud } from "./uploadOnCloud.service.js";
+import crypto from "crypto";
+import { env } from "../config/env.js";
+import { verifyEmailProducer } from "../jobs/producer/verifyEmail.producer.js";
 
 class UserService {
   async registerUser({
@@ -32,6 +35,14 @@ class UserService {
       email,
       password: hashedPassword,
     });
+
+    const token = crypto.randomBytes(32).toString("hex");
+
+    await redisService.setEmailVerificationToken(token, user._id.toString());
+
+    const verificationUrl = `${env.CLIENT_URL}/verify-email?token=${token}`;
+
+    await verifyEmailProducer(email, verificationUrl);
 
     return user;
   }

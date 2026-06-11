@@ -6,6 +6,7 @@ export interface IUser extends Document {
   email: string;
   password: string;
   imageUrl?: string;
+  isVerified: boolean;
 }
 
 
@@ -15,6 +16,7 @@ const userSchema = new mongoose.Schema<IUser>(
     email: { type: String, required: true, unique: true },
     password: { type: String, required: true },
     imageUrl: { type: String },
+    isVerified: { type: Boolean, default: false}
   },
   {
     timestamps: true,

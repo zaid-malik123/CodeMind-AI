@@ -27,6 +27,7 @@ export const COOKIE_EXPIRATION = {
 export const TOKEN_EXPIRATION = {
   ACCESS_TOKEN: "15m",
   REFRESH_TOKEN: "7d",
+  EMAIL_VERIFICATION_TOKEN_EXPIRATION: "60"
 } as const;
 
 export const AUTH_COOKIES = {
@@ -39,6 +40,7 @@ export const RABBIT_QUEUES = {
   REPOSITORY_QUEUE: "repository_queue",
   REPOSITORY_RETRY_QUEUE: "retry_queue",
   REPOSITORY_DLQ: "dead_letter_queue",
+  VERIFY_EMAIL_QUEUE: "verify_email_queue"
 } as const;
 
 export const SOCKER_EMMIT = {

@@ -97,7 +97,7 @@ export const env = {
 
   NODE_ENV: process.env.NODE_ENV || "development",
 
-  CORS_ORIGIN: process.env.CORS_ORIGIN || "http://localhost:5173",
+  CLIENT_URL: process.env.CLIENT_URL || "http://localhost:3000",
 
   ACCESS_TOKEN_SECRET:
     process.env.ACCESS_TOKEN_SECRET,

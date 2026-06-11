@@ -13,6 +13,9 @@ export const connectRabbitMQ = async () => {
 
     await channel.assertQueue(RABBIT_QUEUES.EMAIL_QUEUE, { durable: true });
     await channel.assertQueue(RABBIT_QUEUES.REPOSITORY_QUEUE, { durable: true });
+    await channel.assertQueue(RABBIT_QUEUES.VERIFY_EMAIL_QUEUE, {
+      durable: true
+    })
 
     await channel.assertQueue(RABBIT_QUEUES.REPOSITORY_RETRY_QUEUE, {
       durable: true,
