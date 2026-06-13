@@ -9,9 +9,10 @@ export interface IUser {
 
 
 export interface RegisterPayload  {
-  name: string;
-  email: string;
-  password: string;
+  name?: string | null;
+  email: string | null;
+  password?: string | null;
+  imageUrl?: string | null;
 }
 
 export interface LoginPayload {

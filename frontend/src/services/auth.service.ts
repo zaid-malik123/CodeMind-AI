@@ -15,6 +15,12 @@ class AuthService {
     return res.data;
   };
 
+  google = async (payload: RegisterPayload): Promise<ApiResponse<IUser>> => {
+    const res = await api.post<ApiResponse<IUser>>("/user/google", payload);
+
+    return res.data;
+  };
+
   logout = async (): Promise<ApiResponse<null>> => {
     const res = await api.get<ApiResponse<null>>("/user/logout");
 

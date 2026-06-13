@@ -7,8 +7,10 @@ import { IoClose } from "react-icons/io5";
 import { useForm } from "react-hook-form";
 import { loginSchema, registerSchema } from "../validation/auth.validation";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { signInWithPopup } from 'firebase/auth';
-import { auth, provider } from '../utils/firebase';
+import { signInWithPopup } from "firebase/auth";
+import { auth, provider } from "../utils/firebase";
+import { authService } from "@/services/auth.service";
+import axios from "axios";
 
 type ActiveModalType = "login" | "signup";
 
@@ -28,22 +30,66 @@ const AuthModal = ({ authModalOpen, setAuthModalOpen }: PropsType) => {
 
   const schema = activeModal === "login" ? loginSchema : registerSchema;
 
-  const { register, handleSubmit, reset, formState: {
-    errors,
-    isSubmitting
-  } } = useForm<formData>({
+  const {
+    register,
+    handleSubmit,
+    reset,
+    formState: { errors, isSubmitting },
+  } = useForm<formData>({
     resolver: zodResolver(schema),
   });
 
-  const submit = (data: formData) => {
-    console.log(data);
+  const submit = async (data: formData) => {
+    if (activeModal == "login") {
+      try {
+        const res = await authService.login(data);
+        console.log(res);
+      } catch (error: unknown) {
+        if (axios.isAxiosError(error)) {
+          console.log(error.response?.data.message);
+        } else {
+          console.log("Something went wrong");
+        }
+      }
+    } else {
+      try {
+        const res = await authService.register(data);
+        console.log(res);
+      } catch (error: unknown) {
+        if (axios.isAxiosError(error)) {
+          console.log(error.response?.data.message);
+        } else {
+          console.log("Something went wrong");
+        }
+      }
+    }
   };
-
 
   const handleGoogleLogin = async () => {
     const res = await signInWithPopup(auth, provider);
-    console.log(res)
-  }
+    const name = res.user.displayName;
+    const email = res.user.email;
+    const imageUrl = res.user.photoURL;
+
+    const payload = {
+      name,
+      email,
+      imageUrl,
+    };
+
+    if (payload) {
+      try {
+        const res = await authService.google(payload);
+        console.log(res);
+      } catch (error: unknown) {
+        if (axios.isAxiosError(error)) {
+          console.log(error.response?.data.message);
+        } else {
+          console.log("Something went wrong");
+        }
+      }
+    }
+  };
 
   return (
     <AnimatePresence>
@@ -209,7 +255,10 @@ const AuthModal = ({ authModalOpen, setAuthModalOpen }: PropsType) => {
             </div>
 
             {/* Google Button */}
-            <button onClick={handleGoogleLogin} className="flex w-full items-center justify-center gap-3 rounded-xl border border-border bg-background py-3 font-medium text-foreground transition-colors hover:bg-muted">
+            <button
+              onClick={handleGoogleLogin}
+              className="flex w-full items-center justify-center gap-3 rounded-xl border border-border bg-background py-3 font-medium text-foreground transition-colors hover:bg-muted"
+            >
               <FcGoogle size={22} />
               Continue with Google
             </button>
