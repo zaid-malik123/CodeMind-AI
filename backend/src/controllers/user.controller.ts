@@ -36,6 +36,7 @@ class UserController {
       .json(new ApiResponse(HTTP_STATUS.OK, MESSAGES.LOGIN_SUCCESS, user));
   });
 
+
   verifyUser = asyncHandler ( async ( req, res) => {
 
     const { token } = req.params;
