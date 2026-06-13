@@ -7,6 +7,8 @@ import { IoClose } from "react-icons/io5";
 import { useForm } from "react-hook-form";
 import { loginSchema, registerSchema } from "../validation/auth.validation";
 import { zodResolver } from "@hookform/resolvers/zod";
+import { signInWithPopup } from 'firebase/auth';
+import { auth, provider } from '../utils/firebase';
 
 type ActiveModalType = "login" | "signup";
 
@@ -36,6 +38,12 @@ const AuthModal = ({ authModalOpen, setAuthModalOpen }: PropsType) => {
   const submit = (data: formData) => {
     console.log(data);
   };
+
+
+  const handleGoogleLogin = async () => {
+    const res = await signInWithPopup(auth, provider);
+    console.log(res)
+  }
 
   return (
     <AnimatePresence>
@@ -201,7 +209,7 @@ const AuthModal = ({ authModalOpen, setAuthModalOpen }: PropsType) => {
             </div>
 
             {/* Google Button */}
-            <button className="flex w-full items-center justify-center gap-3 rounded-xl border border-border bg-background py-3 font-medium text-foreground transition-colors hover:bg-muted">
+            <button onClick={handleGoogleLogin} className="flex w-full items-center justify-center gap-3 rounded-xl border border-border bg-background py-3 font-medium text-foreground transition-colors hover:bg-muted">
               <FcGoogle size={22} />
               Continue with Google
             </button>
