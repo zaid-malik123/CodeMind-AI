@@ -1,6 +1,6 @@
 import User from "../models/user.model.js";
 import ApiError from "../utils/ApiError.js";
-import { HTTP_STATUS, MESSAGES } from "../constants/constant.js";
+import { AUTH_PROVIDERS, HTTP_STATUS, MESSAGES } from "../constants/constant.js";
 import bcrypt from "bcryptjs";
 import { verifyRefreshToken } from "../config/jwt.js";
 import redisService from "./redis.service.js";
@@ -69,6 +69,11 @@ class UserService {
     let user = await User.findOne({
       email
     });
+
+    if(user && user.provider === AUTH_PROVIDERS.LOCAL) {
+      user.provider = "google";
+      await user.save();
+    }
 
     if(!user) {
 

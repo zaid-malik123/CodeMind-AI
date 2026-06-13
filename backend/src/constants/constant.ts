@@ -51,6 +51,11 @@ export const SOCKER_EMMIT = {
   AI_RESPONSE: "ai-response"
 };
 
+export const AUTH_PROVIDERS = {
+  LOCAL: "local",
+  GOOGLE: "google"
+}
+
 export const REPO_STATUS = {
   REPO_PENDING: "pending",
   REPO_CLONNING: "cloning",

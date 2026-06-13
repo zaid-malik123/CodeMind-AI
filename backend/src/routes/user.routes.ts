@@ -2,6 +2,7 @@ import express from "express";
 import UserController from "../controllers/user.controller.js";
 import {
   forgotPasswordValidator,
+  googleLoginValidator,
   loginValidator,
   refreshTokenValidator,
   registerValidator,
@@ -26,6 +27,13 @@ router.post(
   validateRequest,
   UserController.loginUser,
 );
+
+router.post(
+  "/google",
+  googleLoginValidator,
+  validateRequest,
+  UserController.googleLogin
+)
 
 router.get("/logout", authMiddleware, UserController.logoutUser);
 
