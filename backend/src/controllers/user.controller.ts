@@ -36,6 +36,19 @@ class UserController {
       .json(new ApiResponse(HTTP_STATUS.OK, MESSAGES.LOGIN_SUCCESS, user));
   });
 
+  googleLogin = asyncHandler( async (req, res) => {
+
+    const { name, email, imageUrl } = req.body;
+    
+    const result = await userService.googleLogin({name, email, imageUrl})
+
+    const { accessToken, refreshToken } = await generateAuthTokens(result.id);
+
+    setAuthCookies(res, accessToken, refreshToken);
+
+    return res.status(HTTP_STATUS.OK).json(new ApiResponse(HTTP_STATUS.OK, MESSAGES.LOGIN_SUCCESS, result))
+
+  })
 
   verifyUser = asyncHandler ( async ( req, res) => {
 

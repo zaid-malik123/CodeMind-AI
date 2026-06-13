@@ -34,6 +34,7 @@ class UserService {
       name,
       email,
       password: hashedPassword,
+      provider: "local"
     });
 
     const token = crypto.randomBytes(32).toString("hex");
@@ -58,6 +59,27 @@ class UserService {
 
     if (!isPasswordValid) {
       throw new ApiError(HTTP_STATUS.BAD_REQUEST, MESSAGES.INVALID_CREDENTIALS);
+    }
+
+    return user;
+  }
+
+  async googleLogin( {name, email, imageUrl}: { name: string, email: string, imageUrl: string} ) {
+
+    let user = await User.findOne({
+      email
+    });
+
+    if(!user) {
+
+      user = await User.create({
+        name,
+        email,
+        imageUrl,
+        provider: "google",
+        isVerified: true
+      })
+
     }
 
     return user;
