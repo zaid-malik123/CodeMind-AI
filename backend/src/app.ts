@@ -44,6 +44,12 @@ app.use(morgan("dev"));
 
 app.use(globalRateLimit);
 
+app.get("/health", (req, res) => {
+  return res.status(200).json({
+    message: "woking .... 👍"
+  })
+})
+
 // routes
 app.use("/api/user", userRoutes);
 app.use("/api/repo", repoRoutes);
