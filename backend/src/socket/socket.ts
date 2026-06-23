@@ -13,7 +13,7 @@ let io: Server;
 const initSocketServer = (server: http.Server) => {
   io = new Server(server, {
     cors: {
-      origin: env.CORS_ORIGIN,
+      origin: env.CLIENT_URL,
       credentials: true,
     },
   });
