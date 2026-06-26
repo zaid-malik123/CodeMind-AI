@@ -94,7 +94,7 @@ const AuthModal = ({ authModalOpen, setAuthModalOpen }: PropsType) => {
 
   return (
     <>
-      {activeModal === "forgot-password" && <ForgotPassword />}
+      {activeModal === "forgot-password" && <ForgotPassword activeModal={activeModal} setActiveModal={setActiveModal} authModalOpen={authModalOpen} setAuthModalOpen={setAuthModalOpen} />}
 
       {activeModal != "forgot-password" && (
         <AnimatePresence>
