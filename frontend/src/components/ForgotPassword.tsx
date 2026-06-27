@@ -1,6 +1,6 @@
 import React, { useEffect, useRef, useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
-import { IoArrowBack, IoClose } from "react-icons/io5";
+import { IoArrowBack, IoClose, IoEyeOutline, IoEyeOffOutline } from "react-icons/io5";
 import { Loader2 } from "lucide-react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -34,6 +34,8 @@ const ForgotPassword = ({
   const [loading, setLoading] = useState(false);
   const [otp, setOtp] = useState(["", "", "", "", "", ""]);
   const [email, setEmail] = useState("");
+  const [showPassword, setShowPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
 
   const {
     register: emailRegister,
@@ -61,7 +63,7 @@ const ForgotPassword = ({
     register: passwordRegister,
     handleSubmit: handlePasswordSubmit,
     formState: { errors: passwordErrors },
-    setError: setResetPasswordError
+    setError: setResetPasswordError,
   } = useForm<PasswordFormValues>({
     resolver: zodResolver(resetPasswordSchema),
   });
@@ -73,7 +75,9 @@ const ForgotPassword = ({
     setActiveModal("login");
     setStep(1);
     setOtp(["", "", "", "", "", ""]);
-    setEmail("")
+    setEmail("");
+    setShowPassword(false);
+    setShowConfirmPassword(false);
   };
 
   const handleChange = (
@@ -139,7 +143,6 @@ const ForgotPassword = ({
 
   const onEmailSubmit = async (data: EmailFormValues) => {
     setLoading(true);
-
     try {
       await authService.forgotPassword(data);
       setLoading(false);
@@ -170,8 +173,8 @@ const ForgotPassword = ({
       setLoading(false);
       if (axios.isAxiosError(error)) {
         setOtpError("otp", {
-          message: error.response?.data.message
-        })
+          message: error.response?.data.message,
+        });
       } else {
         console.log("Something went wrong");
       }
@@ -180,20 +183,16 @@ const ForgotPassword = ({
 
   const onPasswordSubmit = async (data: PasswordFormValues) => {
     setLoading(true);
-
     try {
       await authService.resetPassword(email, data.password);
-
       setLoading(false);
-
-      onClose();
+      setActiveModal("login");
     } catch (error) {
       setLoading(false);
-
       if (axios.isAxiosError(error)) {
         setResetPasswordError("password", {
-          message: error.response?.data.message
-        })
+          message: error.response?.data.message,
+        });
       }
     }
   };
@@ -239,8 +238,7 @@ const ForgotPassword = ({
                   Forgot Password
                 </h2>
                 <p className="mt-2 text-sm text-muted-foreground">
-                  {step === 1 &&
-                    "Enter your email to receive a verification code."}
+                  {step === 1 && "Enter your email to receive a verification code."}
                   {step === 2 && "Enter the 6-digit OTP sent to your email."}
                   {step === 3 && "Create a strong new password."}
                 </p>
@@ -312,7 +310,7 @@ const ForgotPassword = ({
                             ref={(element) => {
                               inputRefs.current[index] = element;
                             }}
-                            className={`h-12 w-12 rounded-xl border text-center text-lg font-semibold bg-background outline-none focus:border-primary transition-all ${
+                            className={`h-12 w-12 rounded-xl border text-center text-lg font-semibold bg-background text-foreground outline-none focus:border-primary transition-all ${
                               otpErrors.otp
                                 ? "border-destructive focus:border-destructive"
                                 : "border-border"
@@ -354,16 +352,25 @@ const ForgotPassword = ({
                 <form onSubmit={handlePasswordSubmit(onPasswordSubmit)}>
                   <div className="space-y-4">
                     <div>
-                      <input
-                        {...passwordRegister("password")}
-                        type="password"
-                        placeholder="New Password"
-                        className={`w-full rounded-xl border bg-background px-4 py-3 text-foreground outline-none focus:border-primary transition-all ${
-                          passwordErrors.password
-                            ? "border-destructive focus:border-destructive"
-                            : "border-border"
-                        }`}
-                      />
+                      <div className="relative flex items-center">
+                        <input
+                          {...passwordRegister("password")}
+                          type={showPassword ? "text" : "password"}
+                          placeholder="New Password"
+                          className={`w-full rounded-xl border bg-background pl-4 pr-12 py-3 text-foreground outline-none focus:border-primary transition-all ${
+                            passwordErrors.password
+                              ? "border-destructive focus:border-destructive"
+                              : "border-border"
+                          }`}
+                        />
+                        <button
+                          type="button"
+                          onClick={() => setShowPassword(!showPassword)}
+                          className="absolute right-4 text-muted-foreground hover:text-foreground transition-colors"
+                        >
+                          {showPassword ? <IoEyeOffOutline size={20} /> : <IoEyeOutline size={20} />}
+                        </button>
+                      </div>
                       {passwordErrors.password && (
                         <p className="mt-1 text-xs text-red-500">
                           {passwordErrors.password.message as string}
@@ -372,16 +379,25 @@ const ForgotPassword = ({
                     </div>
 
                     <div>
-                      <input
-                        {...passwordRegister("confirmPassword")}
-                        type="password"
-                        placeholder="Confirm Password"
-                        className={`w-full rounded-xl border bg-background px-4 py-3 text-foreground outline-none focus:border-primary transition-all ${
-                          passwordErrors.confirmPassword
-                            ? "border-destructive focus:border-destructive"
-                            : "border-border"
-                        }`}
-                      />
+                      <div className="relative flex items-center">
+                        <input
+                          {...passwordRegister("confirmPassword")}
+                          type={showConfirmPassword ? "text" : "password"}
+                          placeholder="Confirm Password"
+                          className={`w-full rounded-xl border bg-background pl-4 pr-12 py-3 text-foreground outline-none focus:border-primary transition-all ${
+                            passwordErrors.confirmPassword
+                              ? "border-destructive focus:border-destructive"
+                              : "border-border"
+                          }`}
+                        />
+                        <button
+                          type="button"
+                          onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                          className="absolute right-4 text-muted-foreground hover:text-foreground transition-colors"
+                        >
+                          {showConfirmPassword ? <IoEyeOffOutline size={20} /> : <IoEyeOutline size={20} />}
+                        </button>
+                      </div>
                       {passwordErrors.confirmPassword && (
                         <p className="mt-1 text-xs text-red-500">
                           {passwordErrors.confirmPassword.message as string}
