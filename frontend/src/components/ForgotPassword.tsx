@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useRef, useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import { IoArrowBack, IoClose } from "react-icons/io5";
 import { Loader2 } from "lucide-react";
@@ -6,22 +6,58 @@ import { Loader2 } from "lucide-react";
 type ActiveModalType = "login" | "signup" | "forgot-password";
 
 type PropsType = {
-  activeModal: ActiveModalType;
   setActiveModal: React.Dispatch<React.SetStateAction<ActiveModalType>>;
   authModalOpen: boolean;
   setAuthModalOpen: React.Dispatch<React.SetStateAction<boolean>>;
 };
 
-const ForgotPassword = ({ activeModal, setActiveModal, authModalOpen, setAuthModalOpen }: PropsType) => {
+const ForgotPassword = ({
+  setActiveModal,
+  authModalOpen,
+  setAuthModalOpen,
+}: PropsType) => {
   const [step, setStep] = useState(1);
   const [loading, setLoading] = useState(false);
+  const [otp, setOtp] = useState(["", "", "", "", "", ""]);
 
+  const inputRefs = useRef<(HTMLInputElement | null)[]>([]);
 
   const onClose = () => {
     setAuthModalOpen(false);
     setActiveModal("login");
-    setStep(1)
-  }
+    setStep(1);
+  };
+
+  const handleChange = (
+    e: React.ChangeEvent<HTMLInputElement>,
+    index: number,
+  ) => {
+
+    const value = e.target.value;
+
+    const newOtp = [...otp];
+
+    newOtp[index] = value;
+
+    setOtp(newOtp);
+
+    if(value && index < otp.length - 1) {
+
+      inputRefs.current[index + 1]?.focus();
+
+    }
+
+  };
+
+  const handleKeyDown = (
+    e: React.KeyboardEvent<HTMLInputElement>,
+    index: number,
+  ) => {
+
+    if(e.key === "Backspace" && otp[index] == "" && index > 0) {
+      inputRefs.current[index - 1]?.focus()
+    }
+  };
 
   return (
     <>
@@ -108,11 +144,16 @@ const ForgotPassword = ({ activeModal, setActiveModal, authModalOpen, setAuthMod
               {step === 2 && (
                 <div className="space-y-6">
                   <div className="flex justify-center gap-2">
-                    {Array.from({ length: 6 }).map((_, index) => (
+                    {Array.from({ length: 6 }).map((_, index: number) => (
                       <input
+                        onChange={(e) => handleChange(e, index)}
                         key={index}
                         maxLength={1}
                         className="h-12 w-12 rounded-xl border border-border bg-background text-center text-lg outline-none focus:border-primary"
+                        ref={(element) => {
+                          inputRefs.current[index] = element;
+                        }}
+                        onKeyDown={(e) => handleKeyDown(e, index)}
                       />
                     ))}
                   </div>
