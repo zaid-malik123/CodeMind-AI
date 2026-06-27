@@ -48,3 +48,33 @@ export const registerSchema = z.object({
       "Must contain one special character",
     ),
 });
+
+export const forgotPasswordEmailSchema = z.object({
+  email: z
+    .string()
+    .trim()
+    .email("Invalid email address"),
+});
+
+export const verifyOtpSchema = z.object({
+  otp: z
+    .string()
+    .length(6, "OTP must be 6 digits")
+    .regex(/^\d+$/, "OTP should contain only numbers"),
+});
+
+export const resetPasswordSchema = z
+  .object({
+    password: z
+      .string()
+      .min(8, "Password must be at least 8 characters")
+      .regex(/[A-Z]/, "Must contain one uppercase letter")
+      .regex(/[a-z]/, "Must contain one lowercase letter")
+      .regex(/[0-9]/, "Must contain one number"),
+
+    confirmPassword: z.string(),
+  })
+  .refine((data) => data.password === data.confirmPassword, {
+    path: ["confirmPassword"],
+    message: "Passwords do not match",
+  });
