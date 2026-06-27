@@ -49,14 +49,22 @@ class AuthService {
     return res.data;
   };
 
+  verifyOtp = async ({otp, email}: {otp: string, email: string}) => {
+
+    const res = await api.post<ApiResponse<null> >("/user/verify-otp", {
+      otp,
+      email
+    })
+
+    return res.data;
+  }
+
   resetPassword = async (
     email: string,
-    otp: string,
     newPassword: string,
   ): Promise<ApiResponse<null>> => {
     const res = await api.post<ApiResponse<null>>("/user/reset-password", {
       email,
-      otp,
       newPassword,
     });
 

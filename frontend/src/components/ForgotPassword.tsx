@@ -33,6 +33,7 @@ const ForgotPassword = ({
   const [step, setStep] = useState(1);
   const [loading, setLoading] = useState(false);
   const [otp, setOtp] = useState(["", "", "", "", "", ""]);
+  const [email, setEmail] = useState("");
 
   const {
     register: emailRegister,
@@ -48,6 +49,7 @@ const ForgotPassword = ({
     formState: { errors: otpErrors },
     setValue,
     clearErrors,
+    setError: setOtpError,
   } = useForm<OtpFormValues>({
     resolver: zodResolver(verifyOtpSchema),
     defaultValues: {
@@ -59,6 +61,7 @@ const ForgotPassword = ({
     register: passwordRegister,
     handleSubmit: handlePasswordSubmit,
     formState: { errors: passwordErrors },
+    setError: setResetPasswordError
   } = useForm<PasswordFormValues>({
     resolver: zodResolver(resetPasswordSchema),
   });
@@ -70,6 +73,7 @@ const ForgotPassword = ({
     setActiveModal("login");
     setStep(1);
     setOtp(["", "", "", "", "", ""]);
+    setEmail("")
   };
 
   const handleChange = (
@@ -137,9 +141,10 @@ const ForgotPassword = ({
     setLoading(true);
 
     try {
-      const res = await authService.forgotPassword(data);
+      await authService.forgotPassword(data);
       setLoading(false);
-      setStep(2)
+      setEmail(data.email);
+      setStep(2);
     } catch (error: unknown) {
       setLoading(false);
       if (axios.isAxiosError(error)) {
@@ -152,27 +157,45 @@ const ForgotPassword = ({
     }
   };
 
-  const onOtpSubmit = (data: OtpFormValues) => {
+  const onOtpSubmit = async (data: OtpFormValues) => {
     setLoading(true);
-    console.log("Step 2 - OTP Submitted Data:", data);
-
-    // API Call Simulation
-    setTimeout(() => {
+    try {
+      await authService.verifyOtp({
+        ...data,
+        email,
+      });
       setLoading(false);
       setStep(3);
-    }, 1000);
+    } catch (error: unknown) {
+      setLoading(false);
+      if (axios.isAxiosError(error)) {
+        setOtpError("otp", {
+          message: error.response?.data.message
+        })
+      } else {
+        console.log("Something went wrong");
+      }
+    }
   };
 
-  const onPasswordSubmit = (data: PasswordFormValues) => {
+  const onPasswordSubmit = async (data: PasswordFormValues) => {
     setLoading(true);
-    console.log("Step 3 - Reset Password Submitted Data:", data);
 
-    // API Call Simulation
-    setTimeout(() => {
+    try {
+      await authService.resetPassword(email, data.password);
+
       setLoading(false);
-      console.log("Password reset successfully!");
-      onClose(); // Modal close kar do completion pr
-    }, 1200);
+
+      onClose();
+    } catch (error) {
+      setLoading(false);
+
+      if (axios.isAxiosError(error)) {
+        setResetPasswordError("password", {
+          message: error.response?.data.message
+        })
+      }
+    }
   };
 
   return (
