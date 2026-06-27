@@ -1,6 +1,10 @@
-import Link from "next/link";
 
-const Landing = () => {
+type propsType = {
+  authModalOpen?: boolean;
+  setAuthModalOpen?: React.Dispatch<React.SetStateAction<boolean>>;
+};
+
+const Landing = ({setAuthModalOpen}: propsType) => {
   return (
     <main className="min-h-screen bg-background text-foreground">
       {/* Hero */}
@@ -21,19 +25,19 @@ const Landing = () => {
         </p>
 
         <div className="mt-10 flex gap-4 sm:flex-row">
-          <Link
-            href="/register"
+          <button
+            onClick={() => setAuthModalOpen?.(true)}
             className="rounded-xl bg-primary px-6 py-3 font-medium text-primary-foreground transition hover:opacity-90"
           >
             Get Started
-          </Link>
+          </button>
 
-          <Link
-            href="/login"
+          <button
+            onClick={() => setAuthModalOpen?.(true)}
             className="rounded-xl border border-border bg-card px-6 py-3 font-medium"
           >
             View Demo
-          </Link>
+          </button>
         </div>
       </section>
 

@@ -13,7 +13,7 @@ const PublicHome = () => {
   return (
     <div>
       <Nav authModalOpen={authModalOpen} setAuthModalOpen={setAuthModalOpen} />
-      <Landing />
+      <Landing setAuthModalOpen={setAuthModalOpen} />
       <ExampleQuestions />
       <Footer />
     </div>

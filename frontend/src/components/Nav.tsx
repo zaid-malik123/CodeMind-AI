@@ -3,20 +3,25 @@
 import { useState, useRef, useEffect } from "react";
 import Link from "next/link";
 import { useAuth } from "@/hooks/useAuth";
-import { IoMoonOutline, IoSunnyOutline, IoLogOutOutline, IoCameraOutline } from "react-icons/io5";
+import {
+  IoMoonOutline,
+  IoSunnyOutline,
+  IoLogOutOutline,
+  IoCameraOutline,
+} from "react-icons/io5";
 import { useTheme } from "@/hooks/useTheme";
 import { useRouter } from "next/navigation";
 import { AnimatePresence, motion } from "framer-motion";
 import AuthModal from "./AuthModal";
 
 type propsType = {
-  authModalOpen: boolean;
-  setAuthModalOpen: React.Dispatch<React.SetStateAction<boolean>>;
+  authModalOpen?: boolean;
+  setAuthModalOpen?: React.Dispatch<React.SetStateAction<boolean>>;
 };
 
 const Nav = ({ authModalOpen, setAuthModalOpen }: propsType) => {
   const { theme, toggleTheme } = useTheme();
-  const { user, logout } = useAuth(); 
+  const { user, logout } = useAuth();
   const router = useRouter();
 
   // Dropdown open/close state
@@ -26,15 +31,16 @@ const Nav = ({ authModalOpen, setAuthModalOpen }: propsType) => {
   // Outside click handle karne ke liye (taaki bahar click karne pr menu close ho jaye)
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
-      if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
+      if (
+        dropdownRef.current &&
+        !dropdownRef.current.contains(event.target as Node)
+      ) {
         setDropdownOpen(false);
       }
     };
     document.addEventListener("mousedown", handleClickOutside);
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
-
-  
 
   return (
     <>
@@ -115,7 +121,6 @@ const Nav = ({ authModalOpen, setAuthModalOpen }: propsType) => {
                               type="file"
                               accept="image/*"
                               className="hidden"
-                              
                             />
                           </label>
                         </div>
@@ -147,7 +152,7 @@ const Nav = ({ authModalOpen, setAuthModalOpen }: propsType) => {
               </div>
             ) : (
               <button
-                onClick={() => setAuthModalOpen(true)}
+                onClick={() => setAuthModalOpen?.(true)}
                 className="rounded-lg bg-primary px-4 py-2 font-medium text-primary-foreground transition hover:opacity-90"
               >
                 Login
@@ -157,10 +162,12 @@ const Nav = ({ authModalOpen, setAuthModalOpen }: propsType) => {
         </div>
       </nav>
 
-      <AuthModal
-        authModalOpen={authModalOpen}
-        setAuthModalOpen={setAuthModalOpen}
-      />
+      {!user && authModalOpen !== undefined && setAuthModalOpen && (
+        <AuthModal
+          authModalOpen={authModalOpen}
+          setAuthModalOpen={setAuthModalOpen}
+        />
+      )}
     </>
   );
 };
