@@ -89,7 +89,8 @@ const AuthModal = ({ authModalOpen, setAuthModalOpen }: PropsType) => {
     if (payload) {
       try {
         const res = await authService.google(payload);
-        console.log(res);
+        setUser(res.data)
+        router.push("/dashboard")
       } catch (error: unknown) {
         if (axios.isAxiosError(error)) {
           console.log(error.response?.data.message);
