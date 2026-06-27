@@ -165,15 +165,8 @@ class UserService {
     return;
   }
 
-  async resetPassword({
-    email,
-    otp,
-    newPassword,
-  }: {
-    email: string;
-    otp: string;
-    newPassword: string;
-  }) {
+  async verifyOtp({otp, email}: {otp: string, email: string}) {
+
     const user = await User.findOne({ email });
 
     if (!user) {
@@ -186,12 +179,41 @@ class UserService {
       throw new ApiError(HTTP_STATUS.BAD_REQUEST, MESSAGES.INVALID_OTP);
     }
 
+    await redisService.setVerifiedOtp(email)
+
+    return;
+
+  }
+
+  async resetPassword({
+    email,
+    newPassword,
+  }: {
+    email: string;
+    newPassword: string;
+  }) {
+    const user = await User.findOne({ email });
+
+    
+
+    if (!user) {
+      throw new ApiError(HTTP_STATUS.NOT_FOUND, MESSAGES.USER_DOES_NOT_EXIST);
+    }
+
+    const verified = await redisService.getVerifiedOtp(email);
+
+    if(!verified) {
+      throw new ApiError(HTTP_STATUS.BAD_REQUEST, MESSAGES.OTP_NOT_VERIFIED)
+    }
+
     const hashedPassword = await bcrypt.hash(newPassword, 12);
 
     user.password = hashedPassword;
     await user.save();
 
     await redisService.removeOtp(email);
+
+    await redisService.delVerifiedOtp(email)
 
     return;
   }

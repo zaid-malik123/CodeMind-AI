@@ -33,6 +33,27 @@ class RedisService {
     await redis.del(key);
   }
 
+  async setVerifiedOtp(email: string) {
+
+    const key = REDIS_KEYS.OTP_VERIFIED(email);
+    await redis.set(key, "true", "EX", 300)
+
+  }
+
+  async getVerifiedOtp(email: string) {
+
+    const key = REDIS_KEYS.OTP_VERIFIED(email);
+    return await redis.get(key)
+
+  }
+
+  async delVerifiedOtp(email: string) {
+
+    const key = REDIS_KEYS.OTP_VERIFIED(email);
+    await redis.del(key)
+
+  }
+
   async setEmailVerificationToken(token: string, userId: string) {
     const key = REDIS_KEYS.EMAIL_VERIFICATION_TOKEN(token);
 

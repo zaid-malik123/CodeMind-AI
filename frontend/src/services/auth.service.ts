@@ -41,9 +41,9 @@ class AuthService {
     return res.data;
   };
 
-  forgotPassword = async (email: string): Promise<ApiResponse<null>> => {
+  forgotPassword = async ({email}: {email: string}): Promise<ApiResponse<null>> => {
     const res = await api.post<ApiResponse<null>>("/user/forgot-password", {
-      email,
+      email
     });
 
     return res.data;

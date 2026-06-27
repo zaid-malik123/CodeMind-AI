@@ -4,6 +4,7 @@ import {
   forgotPasswordValidator,
   googleLoginValidator,
   loginValidator,
+  otpValidator,
   refreshTokenValidator,
   registerValidator,
   resetPasswordValidator,
@@ -55,6 +56,13 @@ router.post(
   validateRequest,
   UserController.forgotPassword,
 );
+
+router.post(
+  "/verify-otp",
+  otpValidator,
+  validateRequest,
+  UserController.verifyOtp
+)
 
 router.post(
   "/reset-password",

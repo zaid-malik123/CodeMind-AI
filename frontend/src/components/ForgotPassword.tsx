@@ -10,6 +10,8 @@ import {
   resetPasswordSchema,
 } from "@/validation/auth.validation";
 import { z } from "zod";
+import { authService } from "@/services/auth.service";
+import axios from "axios";
 
 type ActiveModalType = "login" | "signup" | "forgot-password";
 
@@ -35,6 +37,7 @@ const ForgotPassword = ({
   const {
     register: emailRegister,
     handleSubmit: handleEmailSubmit,
+    setError,
     formState: { errors: emailErrors },
   } = useForm<EmailFormValues>({
     resolver: zodResolver(forgotPasswordEmailSchema),
@@ -52,7 +55,6 @@ const ForgotPassword = ({
     },
   });
 
-  
   const {
     register: passwordRegister,
     handleSubmit: handlePasswordSubmit,
@@ -80,7 +82,7 @@ const ForgotPassword = ({
     setOtp(newOtp);
 
     const fullOtpString = newOtp.join("");
-    setValue("otp", fullOtpString); 
+    setValue("otp", fullOtpString);
 
     if (fullOtpString.length === 6) {
       clearErrors("otp");
@@ -89,7 +91,6 @@ const ForgotPassword = ({
     if (value && index < otp.length - 1) {
       inputRefs.current[index + 1]?.focus();
     }
-
   };
 
   const handleKeyDown = (
@@ -132,21 +133,29 @@ const ForgotPassword = ({
     }
   }, [step]);
 
-
-  const onEmailSubmit = (data: EmailFormValues) => {
+  const onEmailSubmit = async (data: EmailFormValues) => {
     setLoading(true);
-    console.log("Step 1 - Email Submitted Data:", data);
-    
-    setTimeout(() => {
+
+    try {
+      const res = await authService.forgotPassword(data);
       setLoading(false);
-      setStep(2);
-    }, 1000);
+      setStep(2)
+    } catch (error: unknown) {
+      setLoading(false);
+      if (axios.isAxiosError(error)) {
+        setError("email", {
+          message: error.response?.data.message,
+        });
+      } else {
+        console.log("Something went wrong");
+      }
+    }
   };
 
   const onOtpSubmit = (data: OtpFormValues) => {
     setLoading(true);
     console.log("Step 2 - OTP Submitted Data:", data);
-    
+
     // API Call Simulation
     setTimeout(() => {
       setLoading(false);
@@ -157,7 +166,7 @@ const ForgotPassword = ({
   const onPasswordSubmit = (data: PasswordFormValues) => {
     setLoading(true);
     console.log("Step 3 - Reset Password Submitted Data:", data);
-    
+
     // API Call Simulation
     setTimeout(() => {
       setLoading(false);
@@ -165,7 +174,6 @@ const ForgotPassword = ({
       onClose(); // Modal close kar do completion pr
     }, 1200);
   };
-
 
   return (
     <>
@@ -208,7 +216,8 @@ const ForgotPassword = ({
                   Forgot Password
                 </h2>
                 <p className="mt-2 text-sm text-muted-foreground">
-                  {step === 1 && "Enter your email to receive a verification code."}
+                  {step === 1 &&
+                    "Enter your email to receive a verification code."}
                   {step === 2 && "Enter the 6-digit OTP sent to your email."}
                   {step === 3 && "Create a strong new password."}
                 </p>
@@ -236,11 +245,15 @@ const ForgotPassword = ({
                         type="email"
                         placeholder="Email Address"
                         className={`w-full rounded-xl border bg-background px-4 py-3 text-foreground outline-none focus:border-primary transition-all ${
-                          emailErrors.email ? "border-destructive focus:border-destructive" : "border-border"
+                          emailErrors.email
+                            ? "border-destructive focus:border-destructive"
+                            : "border-border"
                         }`}
                       />
                       {emailErrors.email && (
-                        <p className="mt-1 text-xs text-red-500">{emailErrors.email.message as string}</p>
+                        <p className="mt-1 text-xs text-red-500">
+                          {emailErrors.email.message as string}
+                        </p>
                       )}
                     </div>
 
@@ -249,7 +262,11 @@ const ForgotPassword = ({
                       disabled={loading}
                       className="w-full rounded-xl bg-primary py-3 font-semibold text-primary-foreground flex items-center justify-center gap-2 hover:opacity-90 transition-opacity disabled:opacity-50"
                     >
-                      {loading ? <Loader2 className="animate-spin" size={20} /> : "Send OTP"}
+                      {loading ? (
+                        <Loader2 className="animate-spin" size={20} />
+                      ) : (
+                        "Send OTP"
+                      )}
                     </button>
                   </div>
                 </form>
@@ -273,13 +290,17 @@ const ForgotPassword = ({
                               inputRefs.current[index] = element;
                             }}
                             className={`h-12 w-12 rounded-xl border text-center text-lg font-semibold bg-background outline-none focus:border-primary transition-all ${
-                              otpErrors.otp ? "border-destructive focus:border-destructive" : "border-border"
+                              otpErrors.otp
+                                ? "border-destructive focus:border-destructive"
+                                : "border-border"
                             }`}
                           />
                         ))}
                       </div>
                       {otpErrors.otp && (
-                        <p className="text-xs text-red-500 mt-1">{otpErrors.otp.message as string}</p>
+                        <p className="text-xs text-red-500 mt-1">
+                          {otpErrors.otp.message as string}
+                        </p>
                       )}
                     </div>
 
@@ -288,10 +309,17 @@ const ForgotPassword = ({
                       disabled={loading}
                       className="w-full rounded-xl bg-primary py-3 font-semibold text-primary-foreground flex items-center justify-center gap-2 hover:opacity-90 transition-opacity disabled:opacity-50"
                     >
-                      {loading ? <Loader2 className="animate-spin" size={20} /> : "Verify OTP"}
+                      {loading ? (
+                        <Loader2 className="animate-spin" size={20} />
+                      ) : (
+                        "Verify OTP"
+                      )}
                     </button>
 
-                    <button type="button" className="w-full text-sm text-primary hover:underline block text-center">
+                    <button
+                      type="button"
+                      className="w-full text-sm text-primary hover:underline block text-center"
+                    >
                       Resend OTP
                     </button>
                   </div>
@@ -308,11 +336,15 @@ const ForgotPassword = ({
                         type="password"
                         placeholder="New Password"
                         className={`w-full rounded-xl border bg-background px-4 py-3 text-foreground outline-none focus:border-primary transition-all ${
-                          passwordErrors.password ? "border-destructive focus:border-destructive" : "border-border"
+                          passwordErrors.password
+                            ? "border-destructive focus:border-destructive"
+                            : "border-border"
                         }`}
                       />
                       {passwordErrors.password && (
-                        <p className="mt-1 text-xs text-red-500">{passwordErrors.password.message as string}</p>
+                        <p className="mt-1 text-xs text-red-500">
+                          {passwordErrors.password.message as string}
+                        </p>
                       )}
                     </div>
 
@@ -322,11 +354,15 @@ const ForgotPassword = ({
                         type="password"
                         placeholder="Confirm Password"
                         className={`w-full rounded-xl border bg-background px-4 py-3 text-foreground outline-none focus:border-primary transition-all ${
-                          passwordErrors.confirmPassword ? "border-destructive focus:border-destructive" : "border-border"
+                          passwordErrors.confirmPassword
+                            ? "border-destructive focus:border-destructive"
+                            : "border-border"
                         }`}
                       />
                       {passwordErrors.confirmPassword && (
-                        <p className="mt-1 text-xs text-red-500">{passwordErrors.confirmPassword.message as string}</p>
+                        <p className="mt-1 text-xs text-red-500">
+                          {passwordErrors.confirmPassword.message as string}
+                        </p>
                       )}
                     </div>
 
@@ -335,7 +371,11 @@ const ForgotPassword = ({
                       disabled={loading}
                       className="w-full rounded-xl bg-primary py-3 font-semibold text-primary-foreground flex items-center justify-center gap-2 hover:opacity-90 transition-opacity disabled:opacity-50"
                     >
-                      {loading ? <Loader2 className="animate-spin" size={20} /> : "Reset Password"}
+                      {loading ? (
+                        <Loader2 className="animate-spin" size={20} />
+                      ) : (
+                        "Reset Password"
+                      )}
                     </button>
                   </div>
                 </form>

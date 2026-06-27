@@ -67,18 +67,20 @@ export const forgotPasswordValidator = [
     .withMessage("Invalid email"),
 ];
 
+export const otpValidator = [
+  body("otp")
+    .notEmpty()
+    .withMessage("OTP is required")
+    .matches(/^\d{6}$/)
+    .withMessage("OTP must be a valid 6-digit number")
+];
+
 export const resetPasswordValidator = [
   body("email")
     .notEmpty()
     .withMessage("Email is required")
     .isEmail()
     .withMessage("Invalid email"),
-
-  body("otp")
-    .notEmpty()
-    .withMessage("OTP is required")
-    .isLength({ min: 6, max: 6 })
-    .withMessage("OTP must be 6 digits"),
 
   body("newPassword")
     .notEmpty()

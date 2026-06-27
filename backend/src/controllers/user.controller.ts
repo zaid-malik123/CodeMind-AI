@@ -106,10 +106,20 @@ class UserController {
       .json(new ApiResponse(HTTP_STATUS.OK, MESSAGES.MESSAGE_OTP_SENT, {}));
   });
 
-  resetPassword = asyncHandler(async (req, res) => {
-    const { email, otp, newPassword } = req.body;
+  verifyOtp = asyncHandler( async (req, res) => {
 
-    await userService.resetPassword({ email, otp, newPassword });
+    const { otp, email } = req.body;
+
+    await userService.verifyOtp({otp, email});
+
+    res.status(HTTP_STATUS.OK).json(new ApiResponse(HTTP_STATUS.OK, MESSAGES.OTP_VERIFIED, {}))
+
+  })
+
+  resetPassword = asyncHandler(async (req, res) => {
+    const { email, newPassword } = req.body;
+
+    await userService.resetPassword({ email, newPassword });
 
     res
       .status(HTTP_STATUS.OK)
