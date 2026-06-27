@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useContext, useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import { FcGoogle } from "react-icons/fc";
 import { IoClose } from "react-icons/io5";
@@ -12,6 +12,8 @@ import { auth, provider } from "../utils/firebase";
 import { authService } from "@/services/auth.service";
 import axios from "axios";
 import ForgotPassword from "./ForgotPassword";
+import { AuthContext } from "@/context/AuthContext";
+import { useRouter } from "next/navigation";
 
 type ActiveModalType = "login" | "signup" | "forgot-password";
 
@@ -28,6 +30,8 @@ interface formData {
 
 const AuthModal = ({ authModalOpen, setAuthModalOpen }: PropsType) => {
   const [activeModal, setActiveModal] = useState<ActiveModalType>("login");
+  const {setUser} = useContext(AuthContext)!
+  const router = useRouter()
 
   const schema = activeModal === "login" ? loginSchema : registerSchema;
 
@@ -44,7 +48,9 @@ const AuthModal = ({ authModalOpen, setAuthModalOpen }: PropsType) => {
     if (activeModal == "login") {
       try {
         const res = await authService.login(data);
-        console.log(res);
+        setUser(res.data)
+        router.push("/dashboard")
+        
       } catch (error: unknown) {
         if (axios.isAxiosError(error)) {
           console.log(error.response?.data.message);
@@ -55,7 +61,9 @@ const AuthModal = ({ authModalOpen, setAuthModalOpen }: PropsType) => {
     } else {
       try {
         const res = await authService.register(data);
-        console.log(res);
+        setUser(res.data)
+        router.push("/dashboard")
+        
       } catch (error: unknown) {
         if (axios.isAxiosError(error)) {
           console.log(error.response?.data.message);
