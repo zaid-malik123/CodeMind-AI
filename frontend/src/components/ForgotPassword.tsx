@@ -1,4 +1,4 @@
-import React, { useRef, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import { IoArrowBack, IoClose } from "react-icons/io5";
 import { Loader2 } from "lucide-react";
@@ -32,7 +32,6 @@ const ForgotPassword = ({
     e: React.ChangeEvent<HTMLInputElement>,
     index: number,
   ) => {
-
     const value = e.target.value;
 
     const newOtp = [...otp];
@@ -41,23 +40,49 @@ const ForgotPassword = ({
 
     setOtp(newOtp);
 
-    if(value && index < otp.length - 1) {
-
+    if (value && index < otp.length - 1) {
       inputRefs.current[index + 1]?.focus();
-
     }
-
   };
 
   const handleKeyDown = (
     e: React.KeyboardEvent<HTMLInputElement>,
     index: number,
   ) => {
-
-    if(e.key === "Backspace" && otp[index] == "" && index > 0) {
-      inputRefs.current[index - 1]?.focus()
+    if (e.key === "Backspace" && otp[index] == "" && index > 0) {
+      inputRefs.current[index - 1]?.focus();
     }
   };
+
+  const handlePaste = (e: React.ClipboardEvent<HTMLInputElement>) => {
+    e.preventDefault();
+
+    const pastedValue = e.clipboardData.getData("text");
+
+    const cleanedText = pastedValue.replace(/\D/g, "");
+
+    const pastedOtp = cleanedText.split("");
+
+    const otpArray = pastedOtp.slice(0, 6);
+
+    const newOtp = [...otp];
+
+    otpArray.forEach((dig, idx) => {
+      newOtp[idx] = dig;
+    });
+
+    setOtp(newOtp);
+
+    if (otpArray.length > 0) {
+      inputRefs.current[Math.min(otpArray.length, 6) - 1]?.focus();
+    }
+  };
+
+  useEffect(() => {
+    if (step === 2) {
+      inputRefs.current[0]?.focus();
+    }
+  }, [step]);
 
   return (
     <>
@@ -154,6 +179,8 @@ const ForgotPassword = ({
                           inputRefs.current[index] = element;
                         }}
                         onKeyDown={(e) => handleKeyDown(e, index)}
+                        onPaste={handlePaste}
+                        value={otp[index]}
                       />
                     ))}
                   </div>
