@@ -5,7 +5,7 @@ import { createChunks } from "../services/repository/chunk.service.js";
 import { cloneRepository } from "../services/repository/clone.service.js";
 import { readRepositoryFiles } from "../services/repository/read.service.js";
 import { scanRepository } from "../services/repository/scan.service.js";
-import { emitRepoStatus } from "../socket/socker.emit.js";
+import { emitRepoStatus } from "../socket/socket.emit.js";
 import fs from "fs/promises"
 
 export const repoWorker = async (repoId: string, retryCount: number) => {

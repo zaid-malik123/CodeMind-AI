@@ -9,7 +9,7 @@ import { generateChatTitle } from "./ai/ai.generation.chatTitle.service.js";
 import { sendAIResponse } from "./ai/ai.response.service.js";
 import { generateEmbedding } from "./ai/embedding.service.js";
 import { index } from "./ai/vector.service.js";
-import { aiResponseMessageEmit } from "../socket/socker.emit.js";
+import { aiResponseMessageEmit } from "../socket/socket.emit.js";
 
 class ChatService {
   async createChatService({
