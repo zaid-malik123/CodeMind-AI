@@ -4,6 +4,7 @@ export interface createRepoPayload  {
 }
 
 export interface IRepository  {
+  _id: string,
   userId: string;
   githubUrl: string;
   repoName?: string;
