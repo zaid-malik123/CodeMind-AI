@@ -33,7 +33,7 @@ export default function Sidebar() {
   const { user } = useAuth()
 
   return (
-    <aside className="flex h-screen w-72 flex-col border-r border-border bg-background">
+    <aside className="flex h-screen w-72 flex-col border-r border-border bg-background fixed top-0 left-0">
       {/* Logo */}
       <div className="flex h-20 items-center border-border px-6">
         <div className="flex items-center gap-3">

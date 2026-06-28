@@ -22,7 +22,7 @@ const HomeLayout = ({ children }: { children: React.ReactNode }) => {
   return (
     <div className="flex min-h-screen">
       <SideBar />
-      <div className="flex-1">
+      <div className="flex-1 ml-72">
         <Nav />
         {children}
       </div>
