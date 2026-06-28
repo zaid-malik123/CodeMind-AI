@@ -15,6 +15,7 @@ import {
   Lock, 
   Unlock 
 } from "lucide-react";
+import { useRouter } from "next/navigation";
 
 // Dummy Repositories Extended Data
 const initialRepos = [
@@ -76,6 +77,7 @@ const Repo = () => {
   const [repos] = useState(initialRepos);
   const [searchQuery, setSearchQuery] = useState("");
   const [filterLang, setFilterLang] = useState("All");
+  const router = useRouter()
 
   // Filtering Logic
   const filteredRepos = repos.filter(repo => {
@@ -98,6 +100,7 @@ const Repo = () => {
         </div>
 
         <motion.button
+          onClick={() => router.push("/repo/create")}
           whileHover={{ scale: 1.02 }}
           whileTap={{ scale: 0.98 }}
           type="button"

@@ -1,8 +1,8 @@
 "use client";
 
-import React from "react";
 import { motion } from "framer-motion";
 import { Plus, GitFork, Star, Folder, ShieldAlert, Activity } from "lucide-react";
+import { useRouter } from "next/navigation";
 
 // Framer Motion Variants for Staggered Animation
 const containerVariants = {
@@ -29,9 +29,10 @@ const dummyRepos = [
 ];
 
 const Dashboard = () => {
+  const router = useRouter()
   // Dummy Handler for Create Repo
   const handleCreateRepo = () => {
-    alert("Create Repository flow triggered!");
+    router.push("/repo/create")
   };
 
   return (
