@@ -31,9 +31,11 @@ class RepoController {
 
     const limit = Number(req.query.limit) || 10;
 
+    const search = req.query.search?.toString() || "";
+
     const userId = req.user!._id.toString();
 
-    const data = await repoService.getUserRepos(userId, page, limit);
+    const data = await repoService.getUserRepos(userId, page, limit, search);
 
     res
       .status(HTTP_STATUS.OK)

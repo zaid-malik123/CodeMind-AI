@@ -36,7 +36,7 @@ const repositorySchema = new mongoose.Schema<IRepository>(
 );
 
 // Indexes
-repositorySchema.index({ userId: 1 });
+repositorySchema.index({ repoName: 1 });
 repositorySchema.index({ status: 1 });
 
 const Repository = mongoose.model<IRepository>("Repository", repositorySchema);

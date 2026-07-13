@@ -22,17 +22,24 @@ class RepoService {
       repoName,
     });
 
-    await repoProducer({  repoId: repo._id.toString(), retryCount: 0 });
+    await repoProducer({ repoId: repo._id.toString(), retryCount: 0 });
 
     return repo;
   }
 
-  async getUserRepos(userId: string, page: number, limit: number) {
+  async getUserRepos(
+    userId: string,
+    page: number,
+    limit: number,
+    search: string,
+  ) {
     const { docs: repos, pagination } = await paginate({
       model: Repository,
       query: { userId },
       page,
       limit,
+      search,
+      searchFields: ["repoName"],
     });
 
     return {
