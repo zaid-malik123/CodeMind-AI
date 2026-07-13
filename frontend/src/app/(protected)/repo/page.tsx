@@ -2,6 +2,8 @@
 
 import React, { useEffect, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
+import RepoSkeletonCard from "@/components/RepoSkeletonCard"
+ 
 import { 
   Search, 
   GitFork, 
@@ -108,10 +110,12 @@ const Repo = () => {
 
       {/* REPOSITORY CARDS GRID LIST */}
       {loading ? (
-        <div className="flex flex-col items-center justify-center py-24 text-muted-foreground gap-2">
-          <Loader2 className="animate-spin text-primary" size={32} />
-          <p className="text-sm font-medium">Loading repositories...</p>
-        </div>
+        <div className="grid gap-4 md:grid-cols-2">
+    {Array.from({ length: 6 }).map((_, index) => (
+      <RepoSkeletonCard key={index} />
+    ))}
+    
+  </div>
       ) : repos.length > 0 ? (
         <>
           <motion.div layout className="grid gap-4 md:grid-cols-2">
