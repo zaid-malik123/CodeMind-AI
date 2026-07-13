@@ -1,91 +1,69 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { 
   Search, 
   GitFork, 
   Star, 
   Eye, 
-  Filter, 
   Plus, 
   MoreVertical, 
   GitBranch, 
   Clock, 
-  Lock, 
-  Unlock 
+  Globe, 
+  FileCode, 
+  Layers, 
+  CheckCircle2, 
+  Loader2,
+  ChevronLeft,
+  ChevronRight
 } from "lucide-react";
 import { useRouter } from "next/navigation";
-
-// Dummy Repositories Extended Data
-const initialRepos = [
-  {
-    id: 1,
-    name: "codemind-ai-frontend",
-    description: "Next.js 14 production client integrated with Framer Motion, TailwindCSS, and React Hook Form.",
-    isPrivate: false,
-    language: "TypeScript",
-    langColor: "bg-blue-500",
-    stars: 12,
-    forks: 2,
-    watchers: 5,
-    updatedAt: "2 hours ago",
-    activeBranch: "main"
-  },
-  {
-    id: 2,
-    name: "auth-service-backend",
-    description: "High-performance microservice handles stateless JWT session management and OAuth2 providers.",
-    isPrivate: true,
-    language: "Go",
-    langColor: "bg-cyan-500",
-    stars: 4,
-    forks: 0,
-    watchers: 2,
-    updatedAt: "Yesterday",
-    activeBranch: "dev"
-  },
-  {
-    id: 3,
-    name: "analytics-dashboard-v2",
-    description: "Data visualization pipeline mapping high-throughput system charts and client telemetries.",
-    isPrivate: false,
-    language: "JavaScript",
-    langColor: "bg-yellow-500",
-    stars: 48,
-    forks: 14,
-    watchers: 9,
-    updatedAt: "3 days ago",
-    activeBranch: "main"
-  },
-  {
-    id: 4,
-    name: "ai-model-inference",
-    description: "FastAPI server running optimized weights and contextual parsing for production LLM calls.",
-    isPrivate: true,
-    language: "Python",
-    langColor: "bg-green-500",
-    stars: 128,
-    forks: 32,
-    watchers: 41,
-    updatedAt: "1 week ago",
-    activeBranch: "prod-release"
-  }
-];
+import useDebounce from "@/hooks/useDebounce";
+import repoService from "@/services/repo.service";
 
 const Repo = () => {
-  const [repos] = useState(initialRepos);
+  const [repos, setRepos] = useState([]);
   const [searchQuery, setSearchQuery] = useState("");
-  const [filterLang, setFilterLang] = useState("All");
-  const router = useRouter()
+  const search = useDebounce(searchQuery);
+  const [page, setPage] = useState(1);
+  const [totalPages, setTotalPages] = useState(1); // Total pages track karne ke liye state
+  const [loading, setLoading] = useState(true);
+  
+  const router = useRouter();
+  const limit = 10; // Per page items limit
 
-  // Filtering Logic
-  const filteredRepos = repos.filter(repo => {
-    const matchesSearch = repo.name.toLowerCase().includes(searchQuery.toLowerCase()) || 
-                          repo.description.toLowerCase().includes(searchQuery.toLowerCase());
-    const matchesLang = filterLang === "All" || repo.language === filterLang;
-    return matchesSearch && matchesLang;
-  });
+  useEffect(() => {
+    const fetchRepos = async () => {
+      setLoading(true);
+      try {
+        const res = await repoService.getRepo(page, limit, search);
+      
+        if (res?.data) {
+          setRepos(res.data.repos || []);
+          setTotalPages(res.data.pagination.totalPages || 1);
+        } else {
+          setRepos(res || []);
+        }
+      } catch (error) {
+        console.error("Error fetching repos:", error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchRepos();
+  }, [search, page]);
+
+  // Page change handlers
+  const handlePrevPage = () => {
+    if (page > 1) setPage((prev) => prev - 1);
+  };
+
+  const handleNextPage = () => {
+    if (page < totalPages) setPage((prev) => prev + 1);
+  };
 
   return (
     <div className="min-h-screen bg-background p-6 text-foreground md:p-10">
@@ -119,114 +97,131 @@ const Repo = () => {
             type="text"
             placeholder="Search repositories..."
             value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
+            onChange={(e) => {
+              setSearchQuery(e.target.value);
+              setPage(1); // Nayi search par page reset karein 1 par
+            }}
             className="w-full rounded-xl border border-border bg-card pl-10 pr-4 py-2.5 text-sm text-foreground outline-none focus:border-primary transition-colors"
           />
-        </div>
-
-        <div className="flex items-center gap-2">
-          <Filter size={16} className="text-muted-foreground" />
-          <select
-            value={filterLang}
-            onChange={(e) => setFilterLang(e.target.value)}
-            className="rounded-xl border border-border bg-card px-3 py-2.5 text-sm text-foreground outline-none focus:border-primary cursor-pointer"
-          >
-            <option value="All">All Languages</option>
-            <option value="TypeScript">TypeScript</option>
-            <option value="JavaScript">JavaScript</option>
-            <option value="Go">Go</option>
-            <option value="Python">Python</option>
-          </select>
         </div>
       </div>
 
       {/* REPOSITORY CARDS GRID LIST */}
-      <motion.div 
-        layout
-        className="grid gap-4 md:grid-cols-2"
-      >
-        <AnimatePresence mode="popLayout">
-          {filteredRepos.map((repo) => (
-            <motion.div
-              layout
-              key={repo.id}
-              initial={{ opacity: 0, scale: 0.95 }}
-              animate={{ opacity: 1, scale: 1 }}
-              exit={{ opacity: 0, scale: 0.95 }}
-              transition={{ duration: 0.2 }}
-              className="group relative flex flex-col justify-between rounded-2xl border border-border bg-card p-6 shadow-sm transition-all hover:border-primary/40 hover:shadow-md"
-            >
-              <div>
-                {/* Upper Metadata Block */}
-                <div className="flex items-start justify-between gap-4">
-                  <div className="flex flex-wrap items-center gap-2">
-                    <h2 className="text-lg font-bold text-card-foreground cursor-pointer hover:text-primary hover:underline transition-colors">
-                      {repo.name}
-                    </h2>
-                    
-                    {/* Status Pill Badge */}
-                    <span className={`inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-[11px] font-medium border ${
-                      repo.isPrivate 
-                        ? "bg-amber-500/5 text-amber-500 border-amber-500/10" 
-                        : "bg-blue-500/5 text-blue-500 border-blue-500/10"
-                    }`}>
-                      {repo.isPrivate ? <Lock size={10} /> : <Unlock size={10} />}
-                      {repo.isPrivate ? "Private" : "Public"}
-                    </span>
+      {loading ? (
+        <div className="flex flex-col items-center justify-center py-24 text-muted-foreground gap-2">
+          <Loader2 className="animate-spin text-primary" size={32} />
+          <p className="text-sm font-medium">Loading repositories...</p>
+        </div>
+      ) : repos.length > 0 ? (
+        <>
+          <motion.div layout className="grid gap-4 md:grid-cols-2">
+            <AnimatePresence mode="popLayout">
+              {repos.map((repo) => (
+                <motion.div
+                  layout
+                  key={repo._id || repo.id}
+                  initial={{ opacity: 0, scale: 0.95 }}
+                  animate={{ opacity: 1, scale: 1 }}
+                  exit={{ opacity: 0, scale: 0.95 }}
+                  transition={{ duration: 0.2 }}
+                  className="group relative flex flex-col justify-between rounded-2xl border border-border bg-card p-6 shadow-sm transition-all hover:border-primary/40 hover:shadow-md"
+                >
+                  <div>
+                    {/* Upper Metadata Block */}
+                    <div className="flex items-start justify-between gap-4">
+                      <div className="flex flex-wrap items-center gap-2">
+                        <h2 className="text-lg font-bold text-card-foreground cursor-pointer hover:text-primary hover:underline transition-colors">
+                          {repo.repoName || "Unnamed Repository"}
+                        </h2>
+                        
+                        {/* Status Pill Badge based on API response status */}
+                        <span className={`inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-[11px] font-medium border ${
+                          repo.status === "ready" 
+                            ? "bg-emerald-500/5 text-emerald-500 border-emerald-500/10" 
+                            : "bg-amber-500/5 text-amber-500 border-amber-500/10"
+                        }`}>
+                          {repo.status === "ready" ? <CheckCircle2 size={10} /> : <Loader2 size={10} className="animate-spin" />}
+                          <span className="capitalize">{repo.status || "Processing"}</span>
+                        </span>
+                      </div>
+
+                      <button type="button" className="rounded-lg p-1 text-muted-foreground hover:bg-muted hover:text-foreground">
+                        <MoreVertical size={16} />
+                      </button>
+                    </div>
+
+                    {/* Github URL Link */}
+                    <a 
+                      href={repo.githubUrl} 
+                      target="_blank" 
+                      rel="noopener noreferrer"
+                      className="mt-1.5 inline-flex items-center gap-1 text-xs text-muted-foreground hover:text-primary transition-colors"
+                    >
+                      <Globe size={12} />
+                      <span className="truncate max-w-[280px] sm:max-w-xs">{repo.githubUrl}</span>
+                    </a>
                   </div>
 
-                  <button type="button" className="rounded-lg p-1 text-muted-foreground hover:bg-muted hover:text-foreground">
-                    <MoreVertical size={16} />
-                  </button>
-                </div>
+                  {/* Lower Technical Parameters Panel */}
+                  <div className="mt-6">
+                    {/* Metrics Context Info Info */}
+                    <div className="mb-4 flex flex-wrap items-center gap-3 text-xs text-muted-foreground bg-muted/30 px-3 py-2 rounded-xl border border-border/40 w-fit">
+                      <div className="flex items-center gap-1">
+                        <FileCode size={12} className="text-primary" />
+                        <span className="font-mono font-medium text-foreground">{repo.totalFiles || 0} Files</span>
+                      </div>
+                      <div className="flex items-center gap-1 border-l border-border pl-3">
+                        <Layers size={12} className="text-sky-500" />
+                        <span className="font-mono font-medium text-foreground">{repo.totalChunks || 0} Chunks</span>
+                      </div>
+                      <div className="flex items-center gap-1 border-l border-border pl-3">
+                        <Clock size={12} />
+                        <span>{repo.updatedAt ? new Date(repo.updatedAt).toLocaleDateString() : ""}</span>
+                      </div>
+                    </div>
 
-                {/* Description */}
-                <p className="mt-2 text-sm text-muted-foreground line-clamp-2">
-                  {repo.description}
-                </p>
+                    {/* Step Status Indicator Footer */}
+                    <div className="flex items-center justify-between border-t border-border/60 pt-4 text-xs text-muted-foreground">
+                      <div className="flex items-center gap-1.5">
+                        <span className="font-medium text-foreground">Current Step:</span>
+                        <span className="px-2 py-0.5 rounded bg-muted text-foreground font-mono uppercase text-[10px] tracking-wider">
+                          {repo.currentStep || "N/A"}
+                        </span>
+                      </div>
+                    </div>
+                  </div>
+                </motion.div>
+              ))}
+            </AnimatePresence>
+          </motion.div>
+
+          {/* PAGINATION CONTROLS */}
+          {totalPages > 1 && (
+            <div className="mt-8 flex items-center justify-center gap-2 border-t border-border/40 pt-6">
+              <button
+                onClick={handlePrevPage}
+                disabled={page === 1}
+                className="flex items-center justify-center rounded-xl border border-border p-2.5 text-foreground bg-card shadow-sm hover:bg-muted disabled:opacity-40 disabled:hover:bg-card transition-colors"
+              >
+                <ChevronLeft size={16} />
+              </button>
+              
+              <div className="text-sm font-medium px-4 text-muted-foreground">
+                Page <span className="text-foreground">{page}</span> of <span className="text-foreground">{totalPages}</span>
               </div>
 
-              {/* Lower Technical Parameters Panel */}
-              <div className="mt-6">
-                {/* Branch Context info info */}
-                <div className="mb-4 flex items-center gap-3 text-xs text-muted-foreground bg-muted/30 px-3 py-2 rounded-xl border border-border/40 w-fit">
-                  <div className="flex items-center gap-1">
-                    <GitBranch size={12} className="text-primary" />
-                    <span className="font-mono font-medium text-foreground">{repo.activeBranch}</span>
-                  </div>
-                  <div className="flex items-center gap-1 border-l border-border pl-3">
-                    <Clock size={12} />
-                    <span>{repo.updatedAt}</span>
-                  </div>
-                </div>
-
-                {/* Engagement / Language Stats */}
-                <div className="flex items-center justify-between border-t border-border/60 pt-4 text-xs text-muted-foreground">
-                  <div className="flex items-center gap-1.5">
-                    <span className={`h-2.5 w-2.5 rounded-full ${repo.langColor}`} />
-                    <span className="font-medium text-foreground">{repo.language}</span>
-                  </div>
-
-                  <div className="flex items-center gap-4">
-                    <span className="flex items-center gap-1 hover:text-yellow-500 transition-colors cursor-pointer">
-                      <Star size={14} /> {repo.stars}
-                    </span>
-                    <span className="flex items-center gap-1 hover:text-primary transition-colors cursor-pointer">
-                      <GitFork size={14} /> {repo.forks}
-                    </span>
-                    <span className="flex items-center gap-1 sm:flex hidden">
-                      <Eye size={14} /> {repo.watchers}
-                    </span>
-                  </div>
-                </div>
-              </div>
-            </motion.div>
-          ))}
-        </AnimatePresence>
-      </motion.div>
-
-      {/* EMPTY RESULT SET UX STATE */}
-      {filteredRepos.length === 0 && (
+              <button
+                onClick={handleNextPage}
+                disabled={page === totalPages}
+                className="flex items-center justify-center rounded-xl border border-border p-2.5 text-foreground bg-card shadow-sm hover:bg-muted disabled:opacity-40 disabled:hover:bg-card transition-colors"
+              >
+                <ChevronRight size={16} />
+              </button>
+            </div>
+          )}
+        </>
+      ) : (
+        /* EMPTY RESULT SET UX STATE */
         <motion.div 
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
@@ -235,6 +230,7 @@ const Repo = () => {
           <p className="text-sm text-muted-foreground font-medium">No repositories match your search criteria.</p>
         </motion.div>
       )}
+      
     </div>
   );
 };

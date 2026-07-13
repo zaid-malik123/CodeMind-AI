@@ -12,8 +12,8 @@ class RepoService {
     return res.data;
   };
 
-  getRepo = async (page = 1, limit = 10, search: "") => {
-    const res = await api.get<ApiResponse<IRepository[]>>("/repo/create", {
+  getRepo = async (page = 1, limit = 10, search:string = "") => {
+    const res = await api.get("/repo/my-repos", {
       params: {
         page,
         limit,
