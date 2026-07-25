@@ -47,3 +47,18 @@
   --color-muted: var(--muted);
   --color-muted-foreground: var(--muted-foreground);
 }
+
+/* Chrome, Edge, Safari */
+.hide-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+
+/* Firefox */
+.hide-scrollbar {
+  scrollbar-width: none;
+}
+
+/* IE */
+.hide-scrollbar {
+  -ms-overflow-style: none;
+}

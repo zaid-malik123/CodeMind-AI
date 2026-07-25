@@ -120,7 +120,7 @@ const ChatSideBar = () => {
       <div
         onScroll={handleScroll}
         ref={scrollRef}
-        className="flex-1 overflow-y-auto px-3 py-2 space-y-1 custom-scrollbar"
+        className="flex-1 overflow-y-auto px-3 py-2 space-y-1 hide-scrollbar"
       >
         <p className="text-[10px] font-bold tracking-wider text-muted-foreground/60 px-2 mb-2 uppercase">
           Recent Conversations
