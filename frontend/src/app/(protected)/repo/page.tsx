@@ -6,12 +6,11 @@ import RepoSkeletonCard from "@/components/RepoSkeletonCard";
 
 import {
   Search,
-  GitFork,
-  Star,
-  Eye,
+  
+ 
   Plus,
   MoreVertical,
-  GitBranch,
+ 
   Clock,
   Globe,
   FileCode,
