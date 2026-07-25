@@ -114,7 +114,7 @@ ${match.metadata?.content}
       model: Chat,
       filter: { userId, repoId },
       page: 1,
-      limit: 10,
+      limit: 20,
       sort: { createdAt: -1 },
     });
 

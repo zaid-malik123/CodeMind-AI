@@ -7,9 +7,10 @@ import {
 
 type props = {
   repoId: string;
+  chatId?: string;
 };
 
-const ChatBar = ({ repoId }: props) => {
+const ChatBar = ({ repoId, chatId }: props) => {
   const [messages, setMessages] = useState<any[]>([]); 
   const [input, setInput] = useState("");
   const messagesEndRef = useRef<HTMLDivElement>(null);

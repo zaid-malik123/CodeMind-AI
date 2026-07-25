@@ -10,8 +10,13 @@ class ChatService {
         return res.data;
     }
 
-    getAllChats = async (repoId: string, page: number, limit: number = 30) => {
-        const res = await api.get(`/chat/${repoId}`, { params: { page, limit } });
+    getAllChats = async (repoId: string, page: number = 1, limit: number = 20) => {
+        const res = await api.get(`/chat/${repoId}`, {
+            params: {
+                page,
+                limit
+            }
+        });
         return res.data;
     }
 }
