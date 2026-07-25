@@ -15,7 +15,7 @@ router.post(
 )
 
 router.get(
-    "/",
+    "/:repoId",
     authMiddleware,
     chatController.getAllChatsController
 )

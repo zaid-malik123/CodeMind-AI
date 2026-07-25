@@ -109,10 +109,10 @@ ${match.metadata?.content}
     return chat;
   }
 
-  async getAllChatsService(userId: string) {
+  async getAllChatsService(userId: string, repoId: string) {
     const chats = await paginate({
       model: Chat,
-      filter: { userId },
+      filter: { userId, repoId },
       page: 1,
       limit: 10,
       sort: { createdAt: -1 },

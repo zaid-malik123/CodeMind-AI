@@ -5,7 +5,11 @@ import {
   Bot, User, Sparkles, Code2, Terminal, Flame, ShieldCheck, ArrowUp
 } from "lucide-react";
 
-const ChatBar = () => {
+type props = {
+  repoId: string;
+};
+
+const ChatBar = ({ repoId }: props) => {
   const [messages, setMessages] = useState<any[]>([]); 
   const [input, setInput] = useState("");
   const messagesEndRef = useRef<HTMLDivElement>(null);
@@ -38,7 +42,7 @@ const ChatBar = () => {
   const isChatEmpty = messages.length === 0;
 
   return (
-    /* h-full ko relative aur flex flex-col denge taaki iske bacche screen height se bade na ho ske */
+    
     <div className="w-full h-full bg-background text-foreground flex flex-col justify-between absolute inset-0">
       
       {/* 1. TOP DYNAMIC AREA (FLEX-1 MATLAB YE MAIN BODY KA SPACE LEGA) */}

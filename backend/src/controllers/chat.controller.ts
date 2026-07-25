@@ -28,8 +28,8 @@ class chatController {
   getAllChatsController = asyncHandler(
     async (req: AuthenticatedRequest, res: Response) => {
       const userId = req.user!._id.toString();
-
-      const chats = await chatService.getAllChatsService(userId);
+      const repoId = req.params.repoId as string;
+      const chats = await chatService.getAllChatsService(userId, repoId);
 
       res
         .status(HTTP_STATUS.OK)

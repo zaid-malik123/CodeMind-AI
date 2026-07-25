@@ -1,12 +1,20 @@
 import ChatBar from '@/components/ChatBar'
 import React from 'react'
 
-const ChatInterface = () => {
+const ChatInterface = async ({
+  params,
+}: {
+  params: Promise<{ id: string }>
+}) => {
+
+  const { id } = await params;
+
+
   return (
     <div>
-      <ChatBar />
+      <ChatBar repoId={id} />
     </div>
   )
 }
 
-export default ChatInterface
+export default ChatInterface;
