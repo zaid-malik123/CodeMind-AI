@@ -19,7 +19,8 @@ const ChatSideBar = () => {
   const params = useParams();
 
   const activeRepoId = params.repoId?.toString();
-
+  const activeChatId = params.chatId;
+  
   const [chatHistory, setChatHistory] = useState<ChatI[]>([]);
   const [page, setPage] = useState<number>(1);
   const [hasMore, setHasMore] = useState<boolean>(true);
@@ -126,13 +127,13 @@ const ChatSideBar = () => {
         </p>
 
         {chatHistory?.map((chat) => {
-          const isActive = chat._id === params?.id;
+          const isActive = chat._id === activeChatId;
           return (
             <button
               key={chat._id}
               type="button"
               onClick={() => router.push(`/chat/${activeRepoId}/${chat._id}`)}
-              className={`w-full flex items-center gap-2.5 px-3 py-5 rounded-xl text-left text-xs transition-all duration-200 relative group ${
+              className={`w-full flex items-center gap-2.5 px-3 py-4 rounded-xl text-left text-xs transition-all duration-200 relative group ${
                 isActive
                   ? "bg-primary/10 text-primary font-bold shadow-sm"
                   : "text-muted-foreground hover:text-foreground hover:bg-muted/50"
