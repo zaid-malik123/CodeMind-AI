@@ -36,7 +36,7 @@ const Chat = () => {
       setLoading(true);
       try {
         const res = await repoService.getRepo(currentPage, 10, debounceSearch);
-        console.log(res.data.pagination);
+      
         setRepos(res.data.repos || []);
 
         // Update totalPages if returned from backend API (adjust according to your API schema)
