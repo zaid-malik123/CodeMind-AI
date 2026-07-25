@@ -2,24 +2,24 @@
 
 import React, { useEffect, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import RepoSkeletonCard from "@/components/RepoSkeletonCard"
- 
-import { 
-  Search, 
-  GitFork, 
-  Star, 
-  Eye, 
-  Plus, 
-  MoreVertical, 
-  GitBranch, 
-  Clock, 
-  Globe, 
-  FileCode, 
-  Layers, 
-  CheckCircle2, 
+import RepoSkeletonCard from "@/components/RepoSkeletonCard";
+
+import {
+  Search,
+  GitFork,
+  Star,
+  Eye,
+  Plus,
+  MoreVertical,
+  GitBranch,
+  Clock,
+  Globe,
+  FileCode,
+  Layers,
+  CheckCircle2,
   Loader2,
   ChevronLeft,
-  ChevronRight
+  ChevronRight,
 } from "lucide-react";
 import { useRouter } from "next/navigation";
 import useDebounce from "@/hooks/useDebounce";
@@ -32,7 +32,7 @@ const Repo = () => {
   const [page, setPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1); // Total pages track karne ke liye state
   const [loading, setLoading] = useState(true);
-  
+
   const router = useRouter();
   const limit = 10; // Per page items limit
 
@@ -41,7 +41,7 @@ const Repo = () => {
       setLoading(true);
       try {
         const res = await repoService.getRepo(page, limit, search);
-      
+
         if (res?.data) {
           setRepos(res.data.repos || []);
           setTotalPages(res.data.pagination.totalPages || 1);
@@ -69,13 +69,15 @@ const Repo = () => {
 
   return (
     <div className="min-h-screen bg-background p-6 text-foreground md:p-10">
-      
       {/* HEADER SECTION */}
       <div className="mb-8 flex flex-col justify-between gap-4 sm:flex-row sm:items-center">
         <div>
-          <h1 className="text-3xl font-extrabold tracking-tight md:text-4xl">Repositories</h1>
+          <h1 className="text-3xl font-extrabold tracking-tight md:text-4xl">
+            Repositories
+          </h1>
           <p className="mt-1 text-sm text-muted-foreground">
-            Manage your codebase workspaces, active synchronization branches, and production metrics.
+            Manage your codebase workspaces, active synchronization branches,
+            and production metrics.
           </p>
         </div>
 
@@ -111,11 +113,10 @@ const Repo = () => {
       {/* REPOSITORY CARDS GRID LIST */}
       {loading ? (
         <div className="grid gap-4 md:grid-cols-2">
-    {Array.from({ length: 6 }).map((_, index) => (
-      <RepoSkeletonCard key={index} />
-    ))}
-    
-  </div>
+          {Array.from({ length: 6 }).map((_, index) => (
+            <RepoSkeletonCard key={index} />
+          ))}
+        </div>
       ) : repos.length > 0 ? (
         <>
           <motion.div layout className="grid gap-4 md:grid-cols-2">
@@ -137,32 +138,45 @@ const Repo = () => {
                         <h2 className="text-lg font-bold text-card-foreground cursor-pointer hover:text-primary hover:underline transition-colors">
                           {repo.repoName || "Unnamed Repository"}
                         </h2>
-                        
+
                         {/* Status Pill Badge based on API response status */}
-                        <span className={`inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-[11px] font-medium border ${
-                          repo.status === "ready" 
-                            ? "bg-emerald-500/5 text-emerald-500 border-emerald-500/10" 
-                            : "bg-amber-500/5 text-amber-500 border-amber-500/10"
-                        }`}>
-                          {repo.status === "ready" ? <CheckCircle2 size={10} /> : <Loader2 size={10} className="animate-spin" />}
-                          <span className="capitalize">{repo.status || "Processing"}</span>
+                        <span
+                          className={`inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-[11px] font-medium border ${
+                            repo.status === "ready"
+                              ? "bg-emerald-500/5 text-emerald-500 border-emerald-500/10"
+                              : "bg-amber-500/5 text-amber-500 border-amber-500/10"
+                          }`}
+                        >
+                          {repo.status === "ready" ? (
+                            <CheckCircle2 size={10} />
+                          ) : (
+                            <Loader2 size={10} className="animate-spin" />
+                          )}
+                          <span className="capitalize">
+                            {repo.status || "Processing"}
+                          </span>
                         </span>
                       </div>
 
-                      <button type="button" className="rounded-lg p-1 text-muted-foreground hover:bg-muted hover:text-foreground">
+                      <button
+                        type="button"
+                        className="rounded-lg p-1 text-muted-foreground hover:bg-muted hover:text-foreground"
+                      >
                         <MoreVertical size={16} />
                       </button>
                     </div>
 
                     {/* Github URL Link */}
-                    <a 
-                      href={repo.githubUrl} 
-                      target="_blank" 
+                    <a
+                      href={repo.githubUrl}
+                      target="_blank"
                       rel="noopener noreferrer"
                       className="mt-1.5 inline-flex items-center gap-1 text-xs text-muted-foreground hover:text-primary transition-colors"
                     >
                       <Globe size={12} />
-                      <span className="truncate max-w-[280px] sm:max-w-xs">{repo.githubUrl}</span>
+                      <span className="truncate max-w-[280px] sm:max-w-xs">
+                        {repo.githubUrl}
+                      </span>
                     </a>
                   </div>
 
@@ -172,22 +186,32 @@ const Repo = () => {
                     <div className="mb-4 flex flex-wrap items-center gap-3 text-xs text-muted-foreground bg-muted/30 px-3 py-2 rounded-xl border border-border/40 w-fit">
                       <div className="flex items-center gap-1">
                         <FileCode size={12} className="text-primary" />
-                        <span className="font-mono font-medium text-foreground">{repo.totalFiles || 0} Files</span>
+                        <span className="font-mono font-medium text-foreground">
+                          {repo.totalFiles || 0} Files
+                        </span>
                       </div>
                       <div className="flex items-center gap-1 border-l border-border pl-3">
                         <Layers size={12} className="text-sky-500" />
-                        <span className="font-mono font-medium text-foreground">{repo.totalChunks || 0} Chunks</span>
+                        <span className="font-mono font-medium text-foreground">
+                          {repo.totalChunks || 0} Chunks
+                        </span>
                       </div>
                       <div className="flex items-center gap-1 border-l border-border pl-3">
                         <Clock size={12} />
-                        <span>{repo.updatedAt ? new Date(repo.updatedAt).toLocaleDateString() : ""}</span>
+                        <span>
+                          {repo.updatedAt
+                            ? new Date(repo.updatedAt).toLocaleDateString()
+                            : ""}
+                        </span>
                       </div>
                     </div>
 
                     {/* Step Status Indicator Footer */}
                     <div className="flex items-center justify-between border-t border-border/60 pt-4 text-xs text-muted-foreground">
                       <div className="flex items-center gap-1.5">
-                        <span className="font-medium text-foreground">Current Step:</span>
+                        <span className="font-medium text-foreground">
+                          Current Step:
+                        </span>
                         <span className="px-2 py-0.5 rounded bg-muted text-foreground font-mono uppercase text-[10px] tracking-wider">
                           {repo.currentStep || "N/A"}
                         </span>
@@ -209,9 +233,10 @@ const Repo = () => {
               >
                 <ChevronLeft size={16} />
               </button>
-              
+
               <div className="text-sm font-medium px-4 text-muted-foreground">
-                Page <span className="text-foreground">{page}</span> of <span className="text-foreground">{totalPages}</span>
+                Page <span className="text-foreground">{page}</span> of{" "}
+                <span className="text-foreground">{totalPages}</span>
               </div>
 
               <button
@@ -226,15 +251,16 @@ const Repo = () => {
         </>
       ) : (
         /* EMPTY RESULT SET UX STATE */
-        <motion.div 
+        <motion.div
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           className="mt-12 text-center border border-dashed border-border rounded-3xl p-12 bg-card/20"
         >
-          <p className="text-sm text-muted-foreground font-medium">No repositories match your search criteria.</p>
+          <p className="text-sm text-muted-foreground font-medium">
+            No repositories match your search criteria.
+          </p>
         </motion.div>
       )}
-      
     </div>
   );
 };

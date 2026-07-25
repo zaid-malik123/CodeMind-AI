@@ -1,30 +1,81 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { useRouter } from "next/navigation"; // Agar Next.js app router hai
-import { 
-  MessageSquare, GitFork, Star, Lock, Unlock, Search
+import { useRouter } from "next/navigation";
+import {
+  Search,
+  CheckCircle2,
+  Loader2,
+  MoreVertical,
+  Globe,
+  FileCode,
+  Layers,
+  Clock,
+  ChevronLeft,
+  ChevronRight,
 } from "lucide-react";
 
-const dummyRepos = [
-  { id: "repo-1", name: "codemind-ai-frontend", desc: "Next.js 14 production client architecture integrated with Framer Motion, Tailwind CSS, and strict TypeScript compilation.", isPrivate: false, language: "TypeScript", langColor: "bg-blue-500", stars: 12, forks: 2 },
-  { id: "repo-2", name: "auth-service-backend", desc: "High-performance Go microservice handling stateless distributed session management, JWT signing, and secure OAuth2 pipelines.", isPrivate: true, language: "Go", langColor: "bg-cyan-500", stars: 4, forks: 0 },
-  { id: "repo-3", name: "analytics-dashboard-v2", desc: "Real-time telemetry and data visualization pipeline mapping high-throughput system charts and transactional websocket data.", isPrivate: false, language: "JavaScript", langColor: "bg-yellow-500", stars: 48, forks: 14 },
-];
+import useDebounce from "@/hooks/useDebounce";
+import repoService from "@/services/repo.service";
+import RepoSkeletonCard from "@/components/RepoSkeletonCard";
+import { IRepository } from "@/types/repo.types";
 
 const Chat = () => {
   const router = useRouter();
   const [searchQuery, setSearchQuery] = useState("");
+  const debounceSearch = useDebounce(searchQuery);
 
-  // Search logic filter
-  const filteredRepos = dummyRepos.filter((repo) =>
-    repo.name.toLowerCase().includes(searchQuery.toLowerCase())
-  );
+  const [currentPage, setCurrentPage] = useState(1);
+  const [totalPages, setTotalPages] = useState(1);
+  const [loading, setLoading] = useState(false);
+  const [repos, setRepos] = useState<IRepository[]>([]);
+
+  useEffect(() => {
+    const fetchRepos = async () => {
+      setLoading(true);
+      try {
+        const res = await repoService.getRepo(currentPage, 10, debounceSearch);
+        console.log(res.data.pagination);
+        setRepos(res.data.repos || []);
+
+        // Update totalPages if returned from backend API (adjust according to your API schema)
+        if (res.data.pagination.totalPages) {
+          setTotalPages(res.data.pagination.totalPages);
+        } else if (res.data.pagination.total) {
+          setTotalPages(Math.ceil(res.data.pagination.total / 10));
+        }
+      } catch (error: unknown) {
+        if (error instanceof Error) {
+          console.error("Error fetching repositories:", error.message);
+        } else {
+          console.error(
+            "An unknown error occurred while fetching repositories.",
+          );
+        }
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchRepos();
+  }, [currentPage, debounceSearch]);
+
+  // Pagination Handlers
+  const handlePrevPage = () => {
+    if (currentPage > 1) {
+      setCurrentPage((prev) => prev - 1);
+    }
+  };
+
+  const handleNextPage = () => {
+    if (currentPage < totalPages) {
+      setCurrentPage((prev) => prev + 1);
+    }
+  };
 
   const handleStartChat = (repoId: string) => {
-    // Ab click par modal nahi khulega, sidha alag chat panel page par navigate karega!
-    router.push(`/chat/${repoId}`); 
+    router.push(`/chat/${repoId}`);
   };
 
   return (
@@ -38,7 +89,7 @@ const Chat = () => {
           transition={{ duration: 0.3, ease: "easeInOut" }}
           className="w-full max-w-5xl"
         >
-          {/* Header section with modern letter spacing */}
+          {/* Header Section */}
           <div className="mb-12 text-left">
             <span className="text-xs font-semibold uppercase tracking-widest text-primary bg-primary/10 px-3 py-1 rounded-full">
               AI Agent Hub
@@ -47,75 +98,183 @@ const Chat = () => {
               Select a Workspace
             </h1>
             <p className="mt-3 text-base text-muted-foreground max-w-2xl leading-relaxed">
-              Connect your codebase vectors to the CodeMind LLM copilot cluster to initiate secure, context-aware engineering sessions.
+              Connect your codebase vectors to the CodeMind LLM copilot cluster
+              to initiate secure, context-aware engineering sessions.
             </p>
           </div>
 
-          {/* Premium minimal search container */}
+          {/* Search Input */}
           <div className="relative mb-10 max-w-md shadow-sm">
             <Search className="absolute left-4 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground/70" />
             <input
               type="text"
               placeholder="Search repository index..."
               value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
+              onChange={(e) => {
+                (setSearchQuery(e.target.value), setCurrentPage(1));
+              }}
               className="w-full rounded-2xl border border-border bg-card/50 pl-11 pr-4 py-3 text-sm text-foreground outline-none transition-all focus:border-primary/60 focus:ring-4 focus:ring-primary/5 placeholder:text-muted-foreground/60"
             />
           </div>
 
-          {/* Redesigned Premium Cards Grid */}
-          <div className="grid gap-6 sm:grid-cols-1 lg:grid-cols-2">
-            {filteredRepos.map((repo) => (
-              <motion.div
-                key={repo.id}
-                whileHover={{ y: -6, boxShadow: "0 12px 30px -10px rgba(0,0,0,0.08)" }}
-                transition={{ duration: 0.2 }}
-                className="flex flex-col justify-between rounded-2xl border border-border/80 bg-card p-6 transition-all hover:border-primary/30"
-              >
-                <div>
-                  <div className="flex items-center justify-between gap-3 mb-3">
-                    <h3 className="font-bold text-foreground text-lg tracking-tight truncate max-w-[160px] md:max-w-full">
-                      {repo.name}
-                    </h3>
-                    <span className={`inline-flex items-center gap-1 rounded-full px-2.5 py-0.5 text-[10px] font-semibold tracking-wide border uppercase shrink-0 ${
-                      repo.isPrivate 
-                        ? "bg-amber-500/5 text-amber-500 border-amber-500/20" 
-                        : "bg-blue-500/5 text-blue-500 border-blue-500/20"
-                    }`}>
-                      {repo.isPrivate ? <Lock size={10} /> : <Unlock size={10} />}
-                      {repo.isPrivate ? "Private" : "Public"}
-                    </span>
-                  </div>
-                  
-                  <p className="text-sm text-muted-foreground leading-relaxed line-clamp-3 mb-6">
-                    {repo.desc}
-                  </p>
-                </div>
+          {/* Repository Grid / Loading / Empty States */}
+          {loading ? (
+            <div className="grid gap-4 md:grid-cols-2">
+              {Array.from({ length: 6 }).map((_, index) => (
+                <RepoSkeletonCard key={index} />
+              ))}
+            </div>
+          ) : repos.length > 0 ? (
+            <>
+              <motion.div layout className="grid gap-4 md:grid-cols-2">
+                <AnimatePresence mode="popLayout">
+                  {repos.map((repo) => (
+                    <motion.div
+                      layout
+                      key={repo._id}
+                      initial={{ opacity: 0, scale: 0.95 }}
+                      animate={{ opacity: 1, scale: 1 }}
+                      exit={{ opacity: 0, scale: 0.95 }}
+                      transition={{ duration: 0.2 }}
+                      className="group relative flex flex-col justify-between rounded-2xl border border-border bg-card p-6 shadow-sm transition-all hover:border-primary/40 hover:shadow-md"
+                    >
+                      <div>
+                        {/* Upper Metadata Block */}
+                        <div className="flex items-start justify-between gap-4">
+                          <div className="flex flex-wrap items-center gap-2">
+                            <h2 className="text-lg font-bold text-card-foreground cursor-pointer hover:text-primary hover:underline transition-colors">
+                              {repo.repoName || "Unnamed Repository"}
+                            </h2>
 
-                <div>
-                  <div className="flex items-center justify-between border-t border-border/40 pt-4 text-xs font-medium text-muted-foreground/80 mb-4">
-                    <div className="flex items-center gap-2">
-                      <span className={`h-2 w-2 rounded-full ${repo.langColor}`} />
-                      <span>{repo.language}</span>
-                    </div>
-                    <div className="flex gap-3">
-                      <span className="flex items-center gap-1 hover:text-yellow-500 transition-colors"><Star size={13} /> {repo.stars}</span>
-                      <span className="flex items-center gap-1 hover:text-primary transition-colors"><GitFork size={13} /> {repo.forks}</span>
-                    </div>
+                            <span
+                              className={`inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-[11px] font-medium border ${
+                                repo.status === "ready"
+                                  ? "bg-emerald-500/5 text-emerald-500 border-emerald-500/10"
+                                  : "bg-amber-500/5 text-amber-500 border-amber-500/10"
+                              }`}
+                            >
+                              {repo.status === "ready" ? (
+                                <CheckCircle2 size={10} />
+                              ) : (
+                                <Loader2 size={10} className="animate-spin" />
+                              )}
+                              <span className="capitalize">
+                                {repo.status || "Processing"}
+                              </span>
+                            </span>
+                          </div>
+
+                          <button
+                            type="button"
+                            className="rounded-lg p-1 text-muted-foreground hover:bg-muted hover:text-foreground"
+                          >
+                            <MoreVertical size={16} />
+                          </button>
+                        </div>
+
+                        {/* Github Link */}
+                        <a
+                          href={repo.githubUrl}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="mt-1.5 inline-flex items-center gap-1 text-xs text-muted-foreground hover:text-primary transition-colors"
+                        >
+                          <Globe size={12} />
+                          <span className="truncate max-w-[280px] sm:max-w-xs">
+                            {repo.githubUrl}
+                          </span>
+                        </a>
+                      </div>
+
+                      {/* Lower Technical Parameters Panel */}
+                      <div className="mt-6">
+                        <div className="mb-4 flex flex-wrap items-center gap-3 text-xs text-muted-foreground bg-muted/30 px-3 py-2 rounded-xl border border-border/40 w-fit">
+                          <div className="flex items-center gap-1">
+                            <FileCode size={12} className="text-primary" />
+                            <span className="font-mono font-medium text-foreground">
+                              {repo.totalFiles || 0} Files
+                            </span>
+                          </div>
+                          <div className="flex items-center gap-1 border-l border-border pl-3">
+                            <Layers size={12} className="text-sky-500" />
+                            <span className="font-mono font-medium text-foreground">
+                              {repo.totalChunks || 0} Chunks
+                            </span>
+                          </div>
+                          <div className="flex items-center gap-1 border-l border-border pl-3">
+                            <Clock size={12} />
+                            <span>
+                              {repo.updatedAt
+                                ? new Date(repo.updatedAt).toLocaleDateString()
+                                : ""}
+                            </span>
+                          </div>
+                        </div>
+
+                        {/* Step Status Indicator Footer */}
+                        <div className="flex items-center justify-between border-t border-border/60 pt-4 text-xs text-muted-foreground">
+                          <div className="flex items-center gap-1.5">
+                            <span className="font-medium text-foreground">
+                              Current Step:
+                            </span>
+                            <span className="px-2 py-0.5 rounded bg-muted text-foreground font-mono uppercase text-[10px] tracking-wider">
+                              {repo.currentStep || "N/A"}
+                            </span>
+                          </div>
+                        </div>
+
+                        <button
+                          onClick={() => handleStartChat(repo._id )}
+                          className="mt-4 text-sm bg-primary hover:bg-primary/80 text-primary-foreground font-medium rounded-lg px-4 py-2 w-full transition-colors cursor-pointer"
+                        >
+                          Start AI Chat
+                        </button>
+                      </div>
+                    </motion.div>
+                  ))}
+                </AnimatePresence>
+              </motion.div>
+
+              {/* PAGINATION CONTROLS */}
+              {totalPages > 1 && (
+                <div className="mt-8 flex items-center justify-center gap-2 border-t border-border/40 pt-6">
+                  <button
+                    onClick={handlePrevPage}
+                    disabled={currentPage === 1}
+                    aria-label="Previous Page"
+                    className="flex items-center justify-center rounded-xl border border-border p-2.5 text-foreground bg-card shadow-sm hover:bg-muted disabled:opacity-40 disabled:hover:bg-card transition-colors cursor-pointer disabled:cursor-not-allowed"
+                  >
+                    <ChevronLeft size={16} />
+                  </button>
+
+                  <div className="text-sm font-medium px-4 text-muted-foreground">
+                    Page <span className="text-foreground">{currentPage}</span>{" "}
+                    of <span className="text-foreground">{totalPages}</span>
                   </div>
 
                   <button
-                    type="button"
-                    onClick={() => handleStartChat(repo.id)}
-                    className="flex w-full items-center justify-center gap-2 rounded-xl bg-primary py-3 text-sm font-semibold text-primary-foreground shadow-sm transition-all hover:bg-primary/95 active:scale-[0.98]"
+                    onClick={handleNextPage}
+                    disabled={currentPage === totalPages}
+                    aria-label="Next Page"
+                    className="flex items-center justify-center rounded-xl border border-border p-2.5 text-foreground bg-card shadow-sm hover:bg-muted disabled:opacity-40 disabled:hover:bg-card transition-colors cursor-pointer disabled:cursor-not-allowed"
                   >
-                    <MessageSquare size={15} />
-                    <span>Start AI Chat</span>
+                    <ChevronRight size={16} />
                   </button>
                 </div>
-              </motion.div>
-            ))}
-          </div>
+              )}
+            </>
+          ) : (
+            /* EMPTY RESULT SET */
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              className="mt-12 text-center border border-dashed border-border rounded-3xl p-12 bg-card/20"
+            >
+              <p className="text-sm text-muted-foreground font-medium">
+                No repositories match your search criteria.
+              </p>
+            </motion.div>
+          )}
         </motion.div>
       </AnimatePresence>
     </div>

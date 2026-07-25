@@ -14,6 +14,8 @@ export interface IRepository  {
   currentStep?: string;
   errorMessage?: string;
   indexedAt?: Date;
+  createdAt?: Date;
+  updatedAt?: Date;
 }
 
 export type RepoStatus =
