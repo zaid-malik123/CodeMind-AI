@@ -14,6 +14,7 @@ const ChatBar = ({ repoId, chatId }: props) => {
   const [messages, setMessages] = useState<any[]>([]); 
   const [input, setInput] = useState("");
   const messagesEndRef = useRef<HTMLDivElement>(null);
+  
 
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
@@ -48,7 +49,7 @@ const ChatBar = ({ repoId, chatId }: props) => {
       
       {/* 1. TOP DYNAMIC AREA (FLEX-1 MATLAB YE MAIN BODY KA SPACE LEGA) */}
       <div className="flex-1 overflow-y-auto min-h-0 w-full custom-scrollbar">
-        {isChatEmpty ? (
+        {!chatId ? (
           /* EMBEDDED LANDING VIEW (Centered Perfectly) */
           <div className="h-full flex flex-col items-center justify-center px-4 max-w-2xl mx-auto w-full select-none pb-12">
             <div className="mb-6 p-4 rounded-3xl bg-primary/10 text-primary border border-primary/20">
