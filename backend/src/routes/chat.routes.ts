@@ -14,6 +14,11 @@ router.post(
     chatController.chatController
 )
 
+// router.post(
+//     "/test",
+//     chatController.testingForAIResponse
+// )
+
 router.get(
     "/:repoId",
     authMiddleware,

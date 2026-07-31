@@ -11,6 +11,7 @@ class chatController {
       const userId = req.user!._id.toString();
 
       const { repoId, question, chatId } = req.body;
+      
 
       const chat = await chatService.createChatService({
         userId,
@@ -18,6 +19,7 @@ class chatController {
         question,
         chatId,
       });
+
 
       res
         .status(HTTP_STATUS.OK)
@@ -65,6 +67,20 @@ class chatController {
         .json(new ApiResponse(HTTP_STATUS.OK, MESSAGES.CHAT_DELETED));
     }
   )
+
+  // testingForAIResponse = asyncHandler(
+  //   async (req: AuthenticatedRequest, res: Response) => {
+  //     const { question, context } = req.body;
+
+      
+
+  //     const aiResponse = await sendAIResponse({ question, context });
+
+  //     res
+  //       .status(HTTP_STATUS.OK)
+  //       .json(new ApiResponse(HTTP_STATUS.OK, "fetched", aiResponse));
+  //   }
+  // )
 }
 
 export default new chatController();

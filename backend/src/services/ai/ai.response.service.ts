@@ -1,4 +1,5 @@
 import groq from "../../config/groq.config.js";
+import { aiResponseMessageEmit } from "../../socket/socket.emit.js";
 
 const SYSTEM_PROMPT = `
 You are CodeMind AI, an AI assistant specialized in understanding software repositories.
@@ -32,14 +33,20 @@ Response Style:
 export const sendAIResponse = async ({
   question,
   context,
+  chatId,
 }: {
   question: string;
   context: string;
+  chatId: string;
 }) => {
+
+  
   const completion = await groq.chat.completions.create({
     model: "llama-3.3-70b-versatile",
 
     temperature: 0.1,
+
+    stream: true,
 
     messages: [
       {
@@ -73,5 +80,24 @@ Instructions:
     ],
   });
 
-  return completion.choices[0]?.message?.content ?? "";
+  let response = "";
+  for await (const event of completion) {
+
+    const token = event.choices[0]?.delta?.content;
+
+    if(!token) continue;
+
+    aiResponseMessageEmit(chatId, { token });
+
+    response += token;
+    
+  } 
+
+  return response;
+
+  // return completion.choices[0]?.message?.content ?? "";
 };
+
+
+
+    

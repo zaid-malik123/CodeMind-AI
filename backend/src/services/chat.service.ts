@@ -9,7 +9,7 @@ import { generateChatTitle } from "./ai/ai.generation.chatTitle.service.js";
 import { sendAIResponse } from "./ai/ai.response.service.js";
 import { generateEmbedding } from "./ai/embedding.service.js";
 import { index } from "./ai/vector.service.js";
-import { aiResponseMessageEmit } from "../socket/socket.emit.js";
+// import { aiResponseMessageEmit } from "../socket/socket.emit.js";
 
 class ChatService {
   async createChatService({
@@ -95,6 +95,7 @@ ${match.metadata?.content}
     const aiResponse = await sendAIResponse({
       question,
       context,
+      chatId: chat._id.toString(),
     });
 
     const aiMessage = await Message.create({
@@ -104,7 +105,7 @@ ${match.metadata?.content}
       fileRefs,
     });
 
-    await aiResponseMessageEmit(chat._id.toString(), aiMessage)
+    // await aiResponseMessageEmit(chat._id.toString(), aiMessage)
 
     return chat;
   }
