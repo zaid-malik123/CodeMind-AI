@@ -2,15 +2,14 @@
 
 import React, { useEffect, useState, useRef } from "react";
 import { useParams, useRouter } from "next/navigation";
+import { MessageSquare, Plus, ArrowLeft, LogOut } from "lucide-react";
+import { useDispatch, useSelector } from "react-redux";
+import { RootState } from "@/redux/store";
 import {
-  MessageSquare,
-  Plus,
-  ArrowLeft,
-  LogOut,
-} from "lucide-react";
-import { useDispatch, useSelector } from "react-redux"; 
-import { RootState } from "@/redux/store"; 
-import { appendChatHistory, clearChatHistory } from "@/redux/slices/chatSlice";
+  appendChatHistory,
+  clearChatHistory,
+  setActiveChat,
+} from "@/redux/slices/chatSlice";
 import chatService from "@/services/chat.service";
 import ChatHistorySkeleton from "./ChatHistorySkeleton";
 
@@ -39,7 +38,6 @@ const ChatSideBar = () => {
         const res = await chatService.getAllChats(activeRepoId, page, 20);
         const pagination = res.data.pagination;
 
-  
         dispatch(appendChatHistory(res.data.docs));
 
         if (pagination) {
@@ -52,7 +50,7 @@ const ChatSideBar = () => {
           console.error("Error fetching chat history:", error.message);
         } else {
           console.error(
-            "An unknown error occurred while fetching chat history."
+            "An unknown error occurred while fetching chat history.",
           );
         }
       } finally {
@@ -99,6 +97,10 @@ const ChatSideBar = () => {
         </button>
 
         <button
+          onClick={() => {
+            dispatch(setActiveChat(null));
+            router.push(`/chat/${activeRepoId}`);
+          }}
           type="button"
           className="w-full flex items-center justify-between px-3.5 py-2.5 rounded-xl bg-primary text-primary-foreground hover:opacity-95 active:scale-[0.98] transition-all text-xs font-bold shadow-md shadow-primary/10"
         >
