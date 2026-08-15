@@ -19,6 +19,11 @@ class ChatService {
         });
         return res.data;
     }
+
+    getSingleChatMessages = async (chatId: string) => {
+        const res = await api.get(`/chat/${chatId}/messages`);
+        return res.data;
+    }
 }
 
 export default new ChatService();

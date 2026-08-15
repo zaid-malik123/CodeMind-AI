@@ -59,6 +59,22 @@ const ChatBar = ({ repoId, chatId }: props) => {
 
   const isChatEmpty = messages.length === 0;
 
+  useEffect(() => {
+    const fetchMessages = async () => {
+      if (chatId) {
+        try {
+          const res = await chatService.getSingleChatMessages(chatId);
+          console.log(res.data)
+          setMessages(res.data);
+        } catch (error) {
+          console.log(error);
+        }
+      }
+    };
+
+    fetchMessages();
+  }, [chatId]);
+
   return (
     <div className="w-full h-full bg-background text-foreground flex flex-col justify-between absolute inset-0">
       {/* 1. TOP DYNAMIC AREA (FLEX-1 MATLAB YE MAIN BODY KA SPACE LEGA) */}
