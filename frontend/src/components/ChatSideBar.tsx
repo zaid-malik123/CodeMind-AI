@@ -1,27 +1,29 @@
 "use client";
 
-import React, { useEffect, useState, useRef, useCallback } from "react";
+import React, { useEffect, useState, useRef } from "react";
 import { useParams, useRouter } from "next/navigation";
 import {
   MessageSquare,
   Plus,
   ArrowLeft,
-  Terminal,
   LogOut,
-  Loader2,
 } from "lucide-react";
+import { useDispatch, useSelector } from "react-redux"; 
+import { RootState } from "@/redux/store"; 
+import { appendChatHistory, clearChatHistory } from "@/redux/slices/chatSlice";
 import chatService from "@/services/chat.service";
-import { ChatI } from "@/types/chat.types";
 import ChatHistorySkeleton from "./ChatHistorySkeleton";
 
 const ChatSideBar = () => {
   const router = useRouter();
   const params = useParams();
+  const dispatch = useDispatch();
+
+  const chatHistory = useSelector((state: RootState) => state.chat.chatHistory);
 
   const activeRepoId = params.repoId?.toString();
   const activeChatId = params.chatId;
-  
-  const [chatHistory, setChatHistory] = useState<ChatI[]>([]);
+
   const [page, setPage] = useState<number>(1);
   const [hasMore, setHasMore] = useState<boolean>(true);
   const [isLoading, setIsLoading] = useState<boolean>(false);
@@ -36,15 +38,10 @@ const ChatSideBar = () => {
 
         const res = await chatService.getAllChats(activeRepoId, page, 20);
         const pagination = res.data.pagination;
-        setChatHistory((prev) => {
-          const map = new Map();
 
-          [...prev, ...res.data.docs].forEach((chat) => {
-            map.set(chat._id, chat);
-          });
+  
+        dispatch(appendChatHistory(res.data.docs));
 
-          return [...map.values()];
-        });
         if (pagination) {
           setHasMore(pagination.totalPages > page);
         } else {
@@ -55,7 +52,7 @@ const ChatSideBar = () => {
           console.error("Error fetching chat history:", error.message);
         } else {
           console.error(
-            "An unknown error occurred while fetching chat history.",
+            "An unknown error occurred while fetching chat history."
           );
         }
       } finally {
@@ -64,15 +61,13 @@ const ChatSideBar = () => {
     };
 
     fetchChatHistory();
-  }, [activeRepoId, page]);
+  }, [activeRepoId, page, dispatch]);
 
   const handleScroll = () => {
     const scrollElement = scrollRef.current;
-
     if (!scrollElement) return;
 
     const { scrollTop, scrollHeight, clientHeight } = scrollElement;
-
     const bottomReached = scrollTop + clientHeight >= scrollHeight - 20;
 
     if (bottomReached && hasMore && !isLoading) {
@@ -80,14 +75,14 @@ const ChatSideBar = () => {
     }
   };
 
-  // Repo switch reset handler
   useEffect(() => {
     if (activeRepoId) {
-      setChatHistory([]);
+      dispatch(clearChatHistory());
       setPage(1);
       setHasMore(true);
     }
-  }, [activeRepoId]);
+  }, [activeRepoId, dispatch]);
+
   return (
     <aside className="w-[270px] h-screen bg-card/60 backdrop-blur-xl text-foreground flex flex-col justify-between border-r border-border/50 select-none shrink-0 font-sans transition-colors duration-200">
       <div className="p-3.5 space-y-3">
@@ -141,7 +136,11 @@ const ChatSideBar = () => {
             >
               <MessageSquare
                 size={14}
-                className={`shrink-0 ${isActive ? "text-primary" : "text-muted-foreground/60 group-hover:text-muted-foreground"}`}
+                className={`shrink-0 ${
+                  isActive
+                    ? "text-primary"
+                    : "text-muted-foreground/60 group-hover:text-muted-foreground"
+                }`}
               />
               <span className="truncate flex-1">{chat.title}</span>
 

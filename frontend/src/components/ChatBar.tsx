@@ -13,6 +13,8 @@ import {
 } from "lucide-react";
 import chatService from "@/services/chat.service";
 import { useRouter } from "next/navigation";
+import { useAppDispatch, useAppSelector } from "@/hooks/hook";
+import { addChat, setActiveChat } from "@/redux/slices/chatSlice";
 
 type props = {
   repoId: string;
@@ -24,6 +26,8 @@ const ChatBar = ({ repoId, chatId }: props) => {
   const [input, setInput] = useState("");
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const router = useRouter();
+  const dispatch = useAppDispatch();
+  const { activeChatId } = useAppSelector((state) => state.chat);
 
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
@@ -42,6 +46,9 @@ const ChatBar = ({ repoId, chatId }: props) => {
 
       if (!chatId) {
         const newChatId = res.data._id;
+
+        dispatch(addChat(res.data));
+        dispatch(setActiveChat(newChatId));
 
         router.push(`/chat/${repoId}/${newChatId}`);
       }

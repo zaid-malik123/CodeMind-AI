@@ -1,59 +1,60 @@
+// chatSlice.ts
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
-
-type Message = {
-  id: string;
-  role: "user" | "assistant";
-  content: string;
-};
+import { ChatI } from "@/types/chat.types";
 
 type ChatState = {
-  chatId: string | null;
-  messages: Message[];
-  loading: boolean;
+  chatHistory: ChatI[];
+  activeChatId: string | null;
 };
 
 const initialState: ChatState = {
-  chatId: null,
-  messages: [],
-  loading: false,
+  chatHistory: [],
+  activeChatId: null,
 };
 
 const chatSlice = createSlice({
   name: "chat",
-
   initialState,
-
   reducers: {
-    setChatId: (state, action: PayloadAction<string>) => {
-      state.chatId = action.payload;
+    setChatHistory: (state, action: PayloadAction<ChatI[]>) => {
+      state.chatHistory = action.payload;
     },
 
-    addMessage: (state, action: PayloadAction<Message>) => {
-      state.messages.push(action.payload);
+    appendChatHistory: (state, action) => {
+      const existingIds = new Set(state.chatHistory.map((chat) => chat._id));
+
+      const newChats = action.payload.filter(
+        (chat) => !existingIds.has(chat._id),
+      );
+
+      state.chatHistory.push(...newChats);
     },
 
-    setMessages: (state, action: PayloadAction<Message[]>) => {
-      state.messages = action.payload;
-    },
+    addChat: (state, action) => {
+      const exists = state.chatHistory.some(
+        (chat) => chat._id === action.payload._id,
+      );
 
-    setLoading: (state, action: PayloadAction<boolean>) => {
-      state.loading = action.payload;
+      if (!exists) {
+        state.chatHistory.unshift(action.payload);
+      }
     },
-
-    clearChat: (state) => {
-      state.chatId = null;
-      state.messages = [];
-      state.loading = false;
+    setActiveChat: (state, action: PayloadAction<string | null>) => {
+      state.activeChatId = action.payload;
+    },
+    clearChatHistory: (state) => {
+      state.chatHistory = [];
+      state.activeChatId = null;
     },
   },
 });
 
 export const {
-  setChatId,
-  addMessage,
-  setMessages,
-  setLoading,
-  clearChat,
+  setChatHistory,
+  appendChatHistory,
+  addChat,
+  setActiveChat,
+  clearChatHistory,
 } = chatSlice.actions;
 
 export default chatSlice.reducer;
