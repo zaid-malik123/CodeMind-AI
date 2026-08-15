@@ -74,7 +74,7 @@ class UserController {
   });
 
   generateNewAccessToken = asyncHandler(async (req, res) => {
-    const refreshToken = req.cookies?.refreshToken || req.body?.refreshToken;
+    const refreshToken = req.cookies?.refreshToken;
 
     const { accessToken, refreshToken: newRefreshToken } =
       await userService.refreshToken(refreshToken);

@@ -5,7 +5,6 @@ import {
   googleLoginValidator,
   loginValidator,
   otpValidator,
-  refreshTokenValidator,
   registerValidator,
   resetPasswordValidator,
 } from "../validator/user.validation.js";
@@ -40,8 +39,6 @@ router.get("/logout", authMiddleware, UserController.logoutUser);
 
 router.post(
   "/refresh-token",
-  refreshTokenValidator,
-  validateRequest,
   UserController.generateNewAccessToken,
 );
 

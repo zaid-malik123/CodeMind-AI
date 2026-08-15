@@ -33,11 +33,8 @@ class AuthService {
     return res.data;
   };
 
-  refreshToken = async (refreshToken: string): Promise<ApiResponse<null>> => {
-    const res = await api.post<ApiResponse<null>>("/user/refresh-token", {
-      refreshToken,
-    });
-
+  refreshToken = async (): Promise<ApiResponse<null>> => {
+    const res = await api.post<ApiResponse<null>>("/user/refresh-token");
     return res.data;
   };
 

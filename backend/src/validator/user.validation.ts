@@ -51,13 +51,6 @@ export const googleLoginValidator = [
     .optional()
 ]
 
-export const refreshTokenValidator = [
-  body("refreshToken")
-    .notEmpty()
-    .withMessage("Refresh token is required")
-    .isString()
-    .withMessage("Refresh token must be a string"),
-];
 
 export const forgotPasswordValidator = [
   body("email")
