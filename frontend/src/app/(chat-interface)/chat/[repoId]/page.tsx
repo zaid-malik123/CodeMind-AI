@@ -4,15 +4,15 @@ import React from 'react'
 const ChatInterface = async ({
   params,
 }: {
-  params: Promise<{ id: string }>
+  params: Promise<{ repoId: string }>
 }) => {
 
-  const { id } = await params;
+  const { repoId } = await params;
 
 
   return (
     <div>
-      <ChatBar repoId={id} />
+      <ChatBar repoId={repoId} />
     </div>
   )
 }
