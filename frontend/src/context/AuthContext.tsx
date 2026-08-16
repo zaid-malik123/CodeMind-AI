@@ -6,6 +6,7 @@ import { createContext, useEffect, useState, ReactNode } from "react";
 
 import { IUser } from "@/types/user.types";
 import { authService } from "@/services/auth.service";
+import { useRouter } from "next/navigation";
 
 interface AuthContextType {
   user: IUser | null;
@@ -21,6 +22,7 @@ interface Props {
 }
 
 export const AuthProvider = ({ children }: Props) => {
+  const router = useRouter();
   const [user, setUser] = useState<IUser | null>(null);
   const [loading, setLoading] = useState(true);
 
@@ -28,6 +30,7 @@ export const AuthProvider = ({ children }: Props) => {
     try {
       await authService.logout();
       setUser(null);
+      router.push("/dashboard");
     } catch (error) {
       console.error(error);
     }
