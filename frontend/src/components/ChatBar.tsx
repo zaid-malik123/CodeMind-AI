@@ -10,6 +10,7 @@ import {
   Flame,
   ShieldCheck,
   ArrowUp,
+  Loader2,
 } from "lucide-react";
 import chatService from "@/services/chat.service";
 import { useRouter } from "next/navigation";
@@ -29,6 +30,7 @@ const ChatBar = ({ repoId, chatId }: props) => {
   const router = useRouter();
   const dispatch = useAppDispatch();
   const { activeChatId } = useAppSelector((state) => state.chat);
+  const [isSending, setIsSending] = useState(false);
 
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
@@ -37,15 +39,17 @@ const ChatBar = ({ repoId, chatId }: props) => {
   const handleSendMessage = async (e: React.FormEvent) => {
     e.preventDefault();
 
-    if (!input.trim()) return;
+    if (!input.trim() || isSending) return;
 
     const question = input.trim();
 
     try {
+      setIsSending(true);
+
       const res = await chatService.createNewChatTitle({
         repoId,
         question,
-        chatId: chatId ? chatId : "",
+        chatId: chatId ?? "",
       });
 
       const { chat, userMessage, aiMessage } = res.data;
@@ -55,13 +59,15 @@ const ChatBar = ({ repoId, chatId }: props) => {
         dispatch(setActiveChat(chat._id));
 
         router.push(`/chat/${repoId}/${chat._id}`);
+      } else {
+        setMessages((prev) => [...prev, userMessage, aiMessage]);
       }
-
-      setMessages((prev) => [...prev, userMessage, aiMessage]);
 
       setInput("");
     } catch (error) {
       console.log(error);
+    } finally {
+      setIsSending(false);
     }
   };
   const isChatEmpty = messages.length === 0;
@@ -83,10 +89,8 @@ const ChatBar = ({ repoId, chatId }: props) => {
 
   return (
     <div className="w-full h-full bg-background text-foreground flex flex-col justify-between absolute inset-0">
-      {/* 1. TOP DYNAMIC AREA (FLEX-1 MATLAB YE MAIN BODY KA SPACE LEGA) */}
       <div className="flex-1 overflow-y-auto min-h-0 w-full custom-scrollbar">
         {!chatId ? (
-          /* EMBEDDED LANDING VIEW (Centered Perfectly) */
           <div className="h-full flex flex-col items-center justify-center px-4 max-w-2xl mx-auto w-full select-none pb-12">
             <div className="mb-6 p-4 rounded-3xl bg-primary/10 text-primary border border-primary/20">
               <Sparkles size={36} />
@@ -126,7 +130,6 @@ const ChatBar = ({ repoId, chatId }: props) => {
             </div>
           </div>
         ) : (
-          /* CONVERSATION STREAM OVERFLOWS HERE */
           <div className="px-4 py-8 space-y-6 max-w-3xl w-full mx-auto">
             {messages.map((msg) => {
               const isAI = msg.role === "assistant";
@@ -157,19 +160,19 @@ const ChatBar = ({ repoId, chatId }: props) => {
         )}
       </div>
 
-      {/* 2. BOTTOM FIXED INPUT SYSTEM PANEL (STICKY TO THE ABSOLUTE WINDOW BOTTOM) */}
       <div className="p-4 bg-background border-t border-border/40 shrink-0">
-        <div className="max-w-3xl w-full mx-auto relative">
+        <div className="max-w-3xl w-full mx-auto">
           <form
             onSubmit={handleSendMessage}
-            className="relative rounded-2xl border border-border bg-card px-4 py-3 shadow-xl focus-within:border-primary/40 focus-within:ring-2 focus-within:ring-primary/5 transition-all"
+            className="relative flex items-end rounded-2xl border border-border bg-card px-4 py-3 shadow-lg transition-all duration-200 focus-within:border-primary/40 focus-within:ring-2 focus-within:ring-primary/10"
           >
             <textarea
               value={input}
               onChange={(e) => setInput(e.target.value)}
               placeholder="Ask anything regarding architecture configurations..."
               rows={1}
-              className="w-full bg-transparent pr-12 text-sm text-foreground outline-none placeholder:text-muted-foreground/50 resize-none max-h-40 overflow-y-auto"
+              disabled={isSending}
+              className="flex-1 bg-transparent pr-12 text-sm leading-6 text-foreground outline-none placeholder:text-muted-foreground/50 resize-none max-h-40 overflow-y-auto"
               onKeyDown={(e) => {
                 if (e.key === "Enter" && !e.shiftKey) {
                   e.preventDefault();
@@ -177,14 +180,20 @@ const ChatBar = ({ repoId, chatId }: props) => {
                 }
               }}
             />
+
             <button
               type="submit"
-              disabled={!input.trim()}
-              className="absolute right-3 bottom-2.5 p-2 rounded-xl bg-foreground text-background dark:bg-white dark:text-black disabled:bg-muted disabled:text-muted-foreground/40 transition-all shadow-sm"
+              disabled={!input.trim() || isSending}
+              className="absolute right-3 bottom-3 h-8 w-8 flex items-center justify-center rounded-xl bg-foreground text-background dark:bg-white dark:text-black disabled:bg-muted disabled:text-muted-foreground/40 hover:opacity-90 active:scale-95 transition-all"
             >
-              <ArrowUp size={14} strokeWidth={2.5} />
+              {isSending ? (
+                <Loader2 size={15} className="animate-spin" />
+              ) : (
+                <ArrowUp size={15} strokeWidth={2.5} />
+              )}
             </button>
           </form>
+
           <p className="text-[10px] text-center text-muted-foreground/60 mt-2 font-medium tracking-wide">
             CodeMind AI engine handles inference mapping. Verify system
             dependencies manually.
