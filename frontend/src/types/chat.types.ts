@@ -9,6 +9,7 @@ export interface ChatI {
 }
 
 export interface MessageI {
+    _id: string;
     chatId: string;
     role: "user" | "assistant";
     content: string;
@@ -17,4 +18,10 @@ export interface MessageI {
     }[];
     createdAt?: string;
     updatedAt?: string;
+}
+
+export interface CreateChatResponseI {
+  chat: ChatI;
+  userMessage: MessageI;
+  aiMessage: MessageI;
 }

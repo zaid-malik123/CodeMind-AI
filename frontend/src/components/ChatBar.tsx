@@ -15,6 +15,7 @@ import chatService from "@/services/chat.service";
 import { useRouter } from "next/navigation";
 import { useAppDispatch, useAppSelector } from "@/hooks/hook";
 import { addChat, setActiveChat } from "@/redux/slices/chatSlice";
+import { MessageI } from "@/types/chat.types";
 
 type props = {
   repoId: string;
@@ -22,7 +23,7 @@ type props = {
 };
 
 const ChatBar = ({ repoId, chatId }: props) => {
-  const [messages, setMessages] = useState<any[]>([]);
+  const [messages, setMessages] = useState<MessageI[]>([]);
   const [input, setInput] = useState("");
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const router = useRouter();
@@ -35,28 +36,34 @@ const ChatBar = ({ repoId, chatId }: props) => {
 
   const handleSendMessage = async (e: React.FormEvent) => {
     e.preventDefault();
+
     if (!input.trim()) return;
+
+    const question = input.trim();
 
     try {
       const res = await chatService.createNewChatTitle({
         repoId,
-        question: input,
+        question,
         chatId: chatId ? chatId : "",
       });
 
+      const { chat, userMessage, aiMessage } = res.data;
+
       if (!chatId) {
-        const newChatId = res.data._id;
+        dispatch(addChat(chat));
+        dispatch(setActiveChat(chat._id));
 
-        dispatch(addChat(res.data));
-        dispatch(setActiveChat(newChatId));
-
-        router.push(`/chat/${repoId}/${newChatId}`);
+        router.push(`/chat/${repoId}/${chat._id}`);
       }
+
+      setMessages((prev) => [...prev, userMessage, aiMessage]);
+
+      setInput("");
     } catch (error) {
       console.log(error);
     }
   };
-
   const isChatEmpty = messages.length === 0;
 
   useEffect(() => {
@@ -64,7 +71,6 @@ const ChatBar = ({ repoId, chatId }: props) => {
       if (chatId) {
         try {
           const res = await chatService.getSingleChatMessages(chatId);
-          console.log(res.data)
           setMessages(res.data);
         } catch (error) {
           console.log(error);
@@ -125,7 +131,7 @@ const ChatBar = ({ repoId, chatId }: props) => {
             {messages.map((msg) => {
               const isAI = msg.role === "assistant";
               return (
-                <div key={msg.id} className="flex gap-4 items-start">
+                <div key={msg._id} className="flex gap-4 items-start">
                   <div
                     className={`h-8 w-8 rounded-xl border flex items-center justify-center shrink-0 text-xs font-bold ${
                       isAI

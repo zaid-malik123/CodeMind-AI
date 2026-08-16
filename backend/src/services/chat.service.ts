@@ -51,7 +51,7 @@ class ChatService {
       });
     }
 
-     await Message.create({
+     const userMessage = await Message.create({
       chatId: chat._id,
       role: "user",
       content: question,
@@ -107,7 +107,11 @@ ${match.metadata?.content}
 
     // await aiResponseMessageEmit(chat._id.toString(), aiMessage)
 
-    return chat;
+    return {
+      chat,
+      userMessage,
+      aiMessage
+    };
   }
 
   async getAllChatsService(userId: string, repoId: string) {

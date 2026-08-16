@@ -1,12 +1,12 @@
 import { api } from "@/lib/axios";
 import { ApiResponse } from "@/types/api.types";
-import { ChatI } from "@/types/chat.types";
+import { ChatI, CreateChatResponseI } from "@/types/chat.types";
 
 
 class ChatService {
 
-    createNewChatTitle = async (payload: { question: string, repoId: string, chatId: string }): Promise<ApiResponse<ChatI>> => {
-        const res = await api.post<ApiResponse<ChatI>>("/chat/new", payload);
+    createNewChatTitle = async (payload: { question: string, repoId: string, chatId: string }): Promise<ApiResponse<CreateChatResponseI>> => {
+        const res = await api.post<ApiResponse<CreateChatResponseI>>("/chat/new", payload);
         return res.data;
     }
 
