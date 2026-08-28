@@ -97,6 +97,12 @@ if(!process.env.GROQ_MODEL_NAME) {
   );
 }
 
+if(!process.env.GEMINI_EMBEDDING_MODEL) {
+  console.warn(
+    "GEMINI_EMBEDDING_MODEL is not defined in environment variables. Embedding functionality may not work properly.",
+  );
+}
+
 export const env = {
   PORT: process.env.PORT || 5000,
   MONGO_URI: process.env.MONGO_URI || "mongodb://127.0.0.1:27017/code-mind-ai",
@@ -122,6 +128,8 @@ export const env = {
   CLOUDINARY_API_SECRET: process.env.CLOUDINARY_API_SECRET,
 
   AI_API_KEY: process.env.AI_API_KEY,
+  GEMINI_EMBEDDING_MODEL: process.env.GEMINI_EMBEDDING_MODEL,
+
   VECTOR_DB_API_KEY: process.env.VECTOR_DB_API_KEY,
   VECTOR_DB_HOST_NAME: process.env.VECTOR_DB_HOST_NAME,
 
