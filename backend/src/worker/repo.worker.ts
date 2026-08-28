@@ -21,7 +21,6 @@ export const repoWorker = async (repoId: string, retryCount: number) => {
     await repo.save();
 
     const localPath = await cloneRepository(repo.githubUrl!, repoId);
-
     repo.currentStep = REPO_STATUS.REPO_SCANNING;
     emitRepoStatus(repoId, REPO_STATUS.REPO_SCANNING);
     repo.status = REPO_STATUS.REPO_SCANNING;

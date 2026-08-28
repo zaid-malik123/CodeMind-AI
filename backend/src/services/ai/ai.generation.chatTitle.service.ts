@@ -1,8 +1,9 @@
 import groq from "../../config/groq.config.js";
+import { env } from "../../config/env.js";
 
 export const generateChatTitle = async (question: string) => {
   const completion = await groq.chat.completions.create({
-    model: "llama-3.3-70b-versatile",
+    model: env.GROQ_MODEL_NAME!,
 
     temperature: 0.1,
 

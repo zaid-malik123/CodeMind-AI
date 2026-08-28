@@ -91,6 +91,12 @@ if(!process.env.GROQ_API_KEY) {
   );
 }
 
+if(!process.env.GROQ_MODEL_NAME) {
+  console.warn(
+    "GROQ_MODEL_NAME is not defined in environment variables. GROQ functionality may not work properly.",
+  );
+}
+
 export const env = {
   PORT: process.env.PORT || 5000,
   MONGO_URI: process.env.MONGO_URI || "mongodb://127.0.0.1:27017/code-mind-ai",
@@ -120,5 +126,8 @@ export const env = {
   VECTOR_DB_HOST_NAME: process.env.VECTOR_DB_HOST_NAME,
 
   GROQ_API_KEY: process.env.GROQ_API_KEY,
+
+  GROQ_MODEL_NAME: process.env.GROQ_MODEL_NAME,
+
 };
   

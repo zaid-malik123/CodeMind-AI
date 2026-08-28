@@ -11,34 +11,38 @@ interface Chunk {
   content: string;
 }
 
-export const index = pinecone.index(PINECONE_INDEX_NAME, env.VECTOR_DB_HOST_NAME);
+export const index = pinecone.index(
+  PINECONE_INDEX_NAME,
+  env.VECTOR_DB_HOST_NAME,
+);
 export const saveEmbeddings = async (repoId: string, chunks: Chunk[]) => {
-
   const vectors = (
     await Promise.all(
       chunks.map((chunk, i) =>
         limit(async () => {
           const embedding = await generateEmbedding(chunk.content);
-          
-          if (!embedding) {
-            return null;
+
+          if (!embedding || !embedding[0]?.values) {
+            return [];
           }
 
-          return {
-            id: `${repoId}-${i}`,
-            values: embedding[0].values,
-            metadata: {
-              repoId,
-              filePath: chunk.filePath,
-              content: chunk.content,
+          return [
+            {
+              id: `${repoId}-${i}`,
+              values: embedding[0].values,
+              metadata: {
+                repoId,
+                filePath: chunk.filePath,
+                content: chunk.content,
+              },
             },
-          };
+          ];
         }),
       ),
     )
-  ).filter(Boolean);
+  ).flat();
 
-
-
-  await index.upsert({ records: vectors });
+  await index.upsert({
+    records: vectors,
+  });
 };
