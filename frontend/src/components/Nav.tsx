@@ -13,6 +13,7 @@ import { useTheme } from "@/hooks/useTheme";
 import { useRouter } from "next/navigation";
 import { AnimatePresence, motion } from "framer-motion";
 import AuthModal from "./AuthModal";
+import Image from "next/image";
 
 type propsType = {
   authModalOpen?: boolean;
@@ -47,15 +48,16 @@ const Nav = ({ authModalOpen, setAuthModalOpen }: propsType) => {
       <nav className="sticky top-0 z-50 border-b border-border bg-background/80 backdrop-blur">
         <div className="mx-auto flex h-16 max-w-7xl items-center justify-between px-6">
           {/* Logo */}
-          <Link
-            href="/"
-            className="flex items-center gap-2 font-semibold text-foreground"
-          >
-            <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-primary text-primary-foreground">
-              C
-            </div>
-            <span className="text-lg">CodeMind AI</span>
-          </Link>
+          <div className="flex items-center px-6 py-4">
+                 <Image
+                   src={`${theme === "dark" ? "/darkLogo1.png" : "/lightLogo.png"}`}
+                   alt="CodeMind AI"
+                   width={180}
+                   height={60}
+                   className="h-15 w-auto object-contain"
+                   priority
+                 />
+               </div>
 
           {/* Actions */}
           <div className="flex items-center gap-3">

@@ -41,7 +41,7 @@ export default function Sidebar() {
       {/* Logo */}
       <div className="flex items-center px-6 py-4">
         <Image
-          src={`${theme === "dark" ? "/darkLogo.png" : "/lightLogo.png"}`}
+          src={`${theme === "dark" ? "/darkLogo1.png" : "/lightLogo.png"}`}
           alt="CodeMind AI"
           width={180}
           height={60}
