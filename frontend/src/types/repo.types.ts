@@ -3,21 +3,6 @@ export interface createRepoPayload  {
     repoName: string,
 }
 
-export interface IRepository  {
-  _id: string,
-  userId: string;
-  githubUrl: string;
-  repoName?: string;
-  status: "pending" | "cloning" | "scanning" |"chunking" | "embedding" | "ready" | "failed";
-  totalFiles: number;
-  totalChunks: number;
-  currentStep?: string;
-  errorMessage?: string;
-  indexedAt?: Date;
-  createdAt?: Date;
-  updatedAt?: Date;
-}
-
 export type RepoStatus =
   | "pending"
   | "cloning"
@@ -26,4 +11,21 @@ export type RepoStatus =
   | "embedding"
   | "ready"
   | "failed";
+
+
+
+export interface IRepository  {
+  _id: string,
+  userId: string;
+  githubUrl: string;
+  repoName?: string;
+  status: RepoStatus;
+  totalFiles: number;
+  totalChunks: number;
+  currentStep?: string;
+  errorMessage?: string;
+  indexedAt?: Date;
+  createdAt?: Date;
+  updatedAt?: Date;
+}
 
