@@ -147,7 +147,7 @@ const ChatSideBar = ({ isOpen, onClose }: ChatSideBarProps) => {
       {/* ================= CHAT SIDEBAR ================= */}
       <aside
         className={`
-          fixed top-0 left-0 z-50
+          fixed top-0 left-0 z-60
           w-[270px] h-screen
           bg-card/60 backdrop-blur-xl
           text-foreground

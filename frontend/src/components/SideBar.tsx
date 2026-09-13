@@ -55,7 +55,7 @@ export default function Sidebar({ isOpen, onClose }: SidebarProps) {
       {/* Sidebar */}
       <aside
         className={`
-          fixed top-0 left-0 z-50
+          fixed top-0 left-0 z-60
           flex h-screen w-72 flex-col
           border-r border-border bg-background
 
