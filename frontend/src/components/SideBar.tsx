@@ -6,9 +6,10 @@ import {
   LayoutDashboard,
   MessageSquare,
   FolderGit2,
-  Sparkles,
 } from "lucide-react";
 import { useAuth } from "@/hooks/useAuth";
+import Image from "next/image";
+import { useTheme } from "@/hooks/useTheme";
 
 const links = [
   {
@@ -30,26 +31,23 @@ const links = [
 
 export default function Sidebar() {
   const pathname = usePathname();
-  const { user } = useAuth()
+  const { user } = useAuth();
+
+  const { theme } = useTheme();
+  
 
   return (
     <aside className="flex h-screen w-72 flex-col border-r border-border bg-background fixed top-0 left-0">
       {/* Logo */}
-      <div className="flex h-20 items-center border-border px-6">
-        <div className="flex items-center gap-3">
-          <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-primary text-primary-foreground shadow-md">
-            <Sparkles className="h-5 w-5" />
-          </div>
-
-          <div>
-            <h2 className="text-lg font-bold text-foreground">
-              AI Assistant
-            </h2>
-            <p className="text-xs text-muted-foreground">
-              Smart Workspace
-            </p>
-          </div>
-        </div>
+      <div className="flex items-center px-6 py-4">
+        <Image
+          src={`${theme === "dark" ? "/darkLogo.png" : "/lightLogo.png"}`}
+          alt="CodeMind AI"
+          width={180}
+          height={60}
+          className="h-15 w-auto object-contain"
+          priority
+        />
       </div>
 
       {/* Navigation */}
@@ -89,9 +87,7 @@ export default function Sidebar() {
           </div>
 
           <div className="overflow-hidden">
-            <p className="truncate font-medium text-foreground">
-              {user?.name}
-            </p>
+            <p className="truncate font-medium text-foreground">{user?.name}</p>
             <p className="truncate text-xs text-muted-foreground">
               CodeMind AI
             </p>
