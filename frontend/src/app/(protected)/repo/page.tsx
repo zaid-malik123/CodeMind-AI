@@ -6,11 +6,8 @@ import RepoSkeletonCard from "@/components/RepoSkeletonCard";
 
 import {
   Search,
-  
- 
   Plus,
   MoreVertical,
- 
   Clock,
   Globe,
   FileCode,
@@ -19,6 +16,7 @@ import {
   Loader2,
   ChevronLeft,
   ChevronRight,
+  Trash2,
 } from "lucide-react";
 import { useRouter } from "next/navigation";
 import useDebounce from "@/hooks/useDebounce";
@@ -32,6 +30,12 @@ const Repo = () => {
   const [page, setPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1); // Total pages track karne ke liye state
   const [loading, setLoading] = useState(true);
+
+  // Jo repo delete ho rahi hai uski ID track karne ke liye state
+  const [deletingRepoId, setDeletingRepoId] = useState<string | null>(null);
+
+  // Active menu dropdown track karne ke liye state
+  const [activeMenuId, setActiveMenuId] = useState<string | null>(null);
 
   const router = useRouter();
   const limit = 10; // Per page items limit
@@ -65,6 +69,28 @@ const Repo = () => {
 
   const handleNextPage = () => {
     if (page < totalPages) setPage((prev) => prev + 1);
+  };
+
+  // Toggle Dropdown Menu Handler
+  const toggleMenu = (repoId: string, e: React.MouseEvent) => {
+    e.stopPropagation();
+    setActiveMenuId((prev) => (prev === repoId ? null : repoId));
+  };
+
+  // Delete Handler with Skeleton Loader State
+  const handleDeleteRepo = async (repoId: string, e: React.MouseEvent) => {
+    e.stopPropagation();
+    setActiveMenuId(null);
+    setDeletingRepoId(repoId); // Deleting loading state start
+
+    try {
+      await repoService.deleteRepo(repoId);
+      setRepos((prev) => prev.filter((r) => r._id !== repoId));
+    } catch (error) {
+      console.error("Failed to delete repository:", error);
+    } finally {
+      setDeletingRepoId(null); // Deleting loading state end
+    }
   };
 
   return (
@@ -121,105 +147,158 @@ const Repo = () => {
         <>
           <motion.div layout className="grid gap-4 md:grid-cols-2">
             <AnimatePresence mode="popLayout">
-              {repos.map((repo) => (
-                <motion.div
-                  layout
-                  key={repo._id}
-                  initial={{ opacity: 0, scale: 0.95 }}
-                  animate={{ opacity: 1, scale: 1 }}
-                  exit={{ opacity: 0, scale: 0.95 }}
-                  transition={{ duration: 0.2 }}
-                  className="group relative flex flex-col justify-between rounded-2xl border border-border bg-card p-6 shadow-sm transition-all hover:border-primary/40 hover:shadow-md"
-                >
-                  <div>
-                    {/* Upper Metadata Block */}
-                    <div className="flex items-start justify-between gap-4">
-                      <div className="flex flex-wrap items-center gap-2">
-                        <h2 className="text-lg font-bold text-card-foreground cursor-pointer hover:text-primary hover:underline transition-colors">
-                          {repo.repoName || "Unnamed Repository"}
-                        </h2>
+              {repos.map((repo) => {
+                // Agar ye specific repo delete ho rahi hai, toh skeleton render hoga
+                if (deletingRepoId === repo._id) {
+                  return <RepoSkeletonCard key={repo._id} />;
+                }
 
-                        {/* Status Pill Badge based on API response status */}
-                        <span
-                          className={`inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-[11px] font-medium border ${
-                            repo.status === "ready"
-                              ? "bg-emerald-500/5 text-emerald-500 border-emerald-500/10"
-                              : "bg-amber-500/5 text-amber-500 border-amber-500/10"
-                          }`}
-                        >
-                          {repo.status === "ready" ? (
-                            <CheckCircle2 size={10} />
-                          ) : (
-                            <Loader2 size={10} className="animate-spin" />
-                          )}
-                          <span className="capitalize">
-                            {repo.status || "Processing"}
+                const isMenuOpen = activeMenuId === repo._id;
+
+                return (
+                  <motion.div
+                    layout
+                    key={repo._id}
+                    initial={{ opacity: 0, scale: 0.95 }}
+                    animate={{ opacity: 1, scale: 1 }}
+                    exit={{ opacity: 0, scale: 0.95 }}
+                    transition={{ duration: 0.2 }}
+                    className="group relative flex flex-col justify-between rounded-2xl border border-border bg-card p-6 shadow-sm transition-all hover:border-primary/40 hover:shadow-md"
+                  >
+                    <div>
+                      {/* Upper Metadata Block */}
+                      <div className="flex items-start justify-between gap-4">
+                        <div className="flex flex-wrap items-center gap-2">
+                          <h2 className="text-lg font-bold text-card-foreground cursor-pointer hover:text-primary hover:underline transition-colors">
+                            {repo.repoName || "Unnamed Repository"}
+                          </h2>
+
+                          {/* Status Pill Badge based on API response status */}
+                          <span
+                            className={`inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-[11px] font-medium border ${
+                              repo.status === "ready"
+                                ? "bg-emerald-500/5 text-emerald-500 border-emerald-500/10"
+                                : "bg-amber-500/5 text-amber-500 border-amber-500/10"
+                            }`}
+                          >
+                            {repo.status === "ready" ? (
+                              <CheckCircle2 size={10} />
+                            ) : (
+                              <Loader2 size={10} className="animate-spin" />
+                            )}
+                            <span className="capitalize">
+                              {repo.status || "Processing"}
+                            </span>
                           </span>
-                        </span>
+                        </div>
+
+                        {/* More Options Dropdown Container */}
+                        <div className="relative">
+                          <button
+                            type="button"
+                            onClick={(e) => toggleMenu(repo._id, e)}
+                            aria-label="More options"
+                            className="rounded-lg p-1.5 text-muted-foreground hover:bg-muted hover:text-foreground transition-colors cursor-pointer"
+                          >
+                            <MoreVertical size={16} />
+                          </button>
+
+                          {/* Dropdown Menu Overlay */}
+                          <AnimatePresence>
+                            {isMenuOpen && (
+                              <>
+                                {/* Outside click overlay */}
+                                <div
+                                  className="fixed inset-0 z-10"
+                                  onClick={(e) => {
+                                    e.stopPropagation();
+                                    setActiveMenuId(null);
+                                  }}
+                                />
+
+                                {/* Popover Container */}
+                                <motion.div
+                                  initial={{ opacity: 0, scale: 0.95, y: -4 }}
+                                  animate={{ opacity: 1, scale: 1, y: 0 }}
+                                  exit={{ opacity: 0, scale: 0.95, y: -4 }}
+                                  transition={{ duration: 0.15 }}
+                                  className="absolute right-0 top-8 z-20 rounded-xl border border-border bg-popover/95 p-1 shadow-lg backdrop-blur-md"
+                                >
+                                  <button
+                                    type="button"
+                                    onClick={(e) =>
+                                      handleDeleteRepo(repo._id, e)
+                                    }
+                                    className="flex items-center gap-2 rounded-lg px-3 py-2 text-xs font-medium text-red-600 hover:bg-destructive/10 transition-colors cursor-pointer"
+                                  >
+                                    <Trash2
+                                      size={14}
+                                      className="text-destructive"
+                                    />
+                                    <span>Delete</span>
+                                  </button>
+                                </motion.div>
+                              </>
+                            )}
+                          </AnimatePresence>
+                        </div>
                       </div>
 
-                      <button
-                        type="button"
-                        className="rounded-lg p-1 text-muted-foreground hover:bg-muted hover:text-foreground"
+                      {/* Github URL Link */}
+                      <a
+                        href={repo.githubUrl}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="mt-1.5 inline-flex items-center gap-1 text-xs text-muted-foreground hover:text-primary transition-colors"
                       >
-                        <MoreVertical size={16} />
-                      </button>
+                        <Globe size={12} />
+                        <span className="truncate max-w-[280px] sm:max-w-xs">
+                          {repo.githubUrl}
+                        </span>
+                      </a>
                     </div>
 
-                    {/* Github URL Link */}
-                    <a
-                      href={repo.githubUrl}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="mt-1.5 inline-flex items-center gap-1 text-xs text-muted-foreground hover:text-primary transition-colors"
-                    >
-                      <Globe size={12} />
-                      <span className="truncate max-w-[280px] sm:max-w-xs">
-                        {repo.githubUrl}
-                      </span>
-                    </a>
-                  </div>
+                    {/* Lower Technical Parameters Panel */}
+                    <div className="mt-6">
+                      {/* Metrics Context Info Info */}
+                      <div className="mb-4 flex flex-wrap items-center gap-3 text-xs text-muted-foreground bg-muted/30 px-3 py-2 rounded-xl border border-border/40 w-fit">
+                        <div className="flex items-center gap-1">
+                          <FileCode size={12} className="text-primary" />
+                          <span className="font-mono font-medium text-foreground">
+                            {repo.totalFiles || 0} Files
+                          </span>
+                        </div>
+                        <div className="flex items-center gap-1 border-l border-border pl-3">
+                          <Layers size={12} className="text-sky-500" />
+                          <span className="font-mono font-medium text-foreground">
+                            {repo.totalChunks || 0} Chunks
+                          </span>
+                        </div>
+                        <div className="flex items-center gap-1 border-l border-border pl-3">
+                          <Clock size={12} />
+                          <span>
+                            {repo.updatedAt
+                              ? new Date(repo.updatedAt).toLocaleDateString()
+                              : ""}
+                          </span>
+                        </div>
+                      </div>
 
-                  {/* Lower Technical Parameters Panel */}
-                  <div className="mt-6">
-                    {/* Metrics Context Info Info */}
-                    <div className="mb-4 flex flex-wrap items-center gap-3 text-xs text-muted-foreground bg-muted/30 px-3 py-2 rounded-xl border border-border/40 w-fit">
-                      <div className="flex items-center gap-1">
-                        <FileCode size={12} className="text-primary" />
-                        <span className="font-mono font-medium text-foreground">
-                          {repo.totalFiles || 0} Files
-                        </span>
-                      </div>
-                      <div className="flex items-center gap-1 border-l border-border pl-3">
-                        <Layers size={12} className="text-sky-500" />
-                        <span className="font-mono font-medium text-foreground">
-                          {repo.totalChunks || 0} Chunks
-                        </span>
-                      </div>
-                      <div className="flex items-center gap-1 border-l border-border pl-3">
-                        <Clock size={12} />
-                        <span>
-                          {repo.updatedAt
-                            ? new Date(repo.updatedAt).toLocaleDateString()
-                            : ""}
-                        </span>
+                      {/* Step Status Indicator Footer */}
+                      <div className="flex items-center justify-between border-t border-border/60 pt-4 text-xs text-muted-foreground">
+                        <div className="flex items-center gap-1.5">
+                          <span className="font-medium text-foreground">
+                            Current Step:
+                          </span>
+                          <span className="px-2 py-0.5 rounded bg-muted text-foreground font-mono uppercase text-[10px] tracking-wider">
+                            {repo.currentStep || "N/A"}
+                          </span>
+                        </div>
                       </div>
                     </div>
-
-                    {/* Step Status Indicator Footer */}
-                    <div className="flex items-center justify-between border-t border-border/60 pt-4 text-xs text-muted-foreground">
-                      <div className="flex items-center gap-1.5">
-                        <span className="font-medium text-foreground">
-                          Current Step:
-                        </span>
-                        <span className="px-2 py-0.5 rounded bg-muted text-foreground font-mono uppercase text-[10px] tracking-wider">
-                          {repo.currentStep || "N/A"}
-                        </span>
-                      </div>
-                    </div>
-                  </div>
-                </motion.div>
-              ))}
+                  </motion.div>
+                );
+              })}
             </AnimatePresence>
           </motion.div>
 
@@ -229,7 +308,7 @@ const Repo = () => {
               <button
                 onClick={handlePrevPage}
                 disabled={page === 1}
-                className="flex items-center justify-center rounded-xl border border-border p-2.5 text-foreground bg-card shadow-sm hover:bg-muted disabled:opacity-40 disabled:hover:bg-card transition-colors"
+                className="flex items-center justify-center rounded-xl border border-border p-2.5 text-foreground bg-card shadow-sm hover:bg-muted disabled:opacity-40 disabled:hover:bg-card transition-colors cursor-pointer disabled:cursor-not-allowed"
               >
                 <ChevronLeft size={16} />
               </button>
@@ -242,7 +321,7 @@ const Repo = () => {
               <button
                 onClick={handleNextPage}
                 disabled={page === totalPages}
-                className="flex items-center justify-center rounded-xl border border-border p-2.5 text-foreground bg-card shadow-sm hover:bg-muted disabled:opacity-40 disabled:hover:bg-card transition-colors"
+                className="flex items-center justify-center rounded-xl border border-border p-2.5 text-foreground bg-card shadow-sm hover:bg-muted disabled:opacity-40 disabled:hover:bg-card transition-colors cursor-pointer disabled:cursor-not-allowed"
               >
                 <ChevronRight size={16} />
               </button>
