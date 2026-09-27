@@ -23,9 +23,10 @@ import {
 import { useRouter } from "next/navigation";
 import useDebounce from "@/hooks/useDebounce";
 import repoService from "@/services/repo.service";
+import { IRepository } from "@/types/repo.types";
 
 const Repo = () => {
-  const [repos, setRepos] = useState([]);
+  const [repos, setRepos] = useState<IRepository[]>([]);
   const [searchQuery, setSearchQuery] = useState("");
   const search = useDebounce(searchQuery);
   const [page, setPage] = useState(1);
@@ -123,7 +124,7 @@ const Repo = () => {
               {repos.map((repo) => (
                 <motion.div
                   layout
-                  key={repo._id || repo.id}
+                  key={repo._id}
                   initial={{ opacity: 0, scale: 0.95 }}
                   animate={{ opacity: 1, scale: 1 }}
                   exit={{ opacity: 0, scale: 0.95 }}

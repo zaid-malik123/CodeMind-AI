@@ -24,7 +24,7 @@ const chatSlice = createSlice({
       const existingIds = new Set(state.chatHistory.map((chat) => chat._id));
 
       const newChats = action.payload.filter(
-        (chat) => !existingIds.has(chat._id),
+        (chat: ChatI) => !existingIds.has(chat._id),
       );
 
       state.chatHistory.push(...newChats);
