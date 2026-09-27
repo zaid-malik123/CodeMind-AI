@@ -12,6 +12,7 @@ import {
   IoCameraOutline,
   IoMenuOutline,
 } from "react-icons/io5";
+import { Loader2 } from "lucide-react";
 
 import { useTheme } from "@/hooks/useTheme";
 import { useRouter } from "next/navigation";
@@ -19,6 +20,7 @@ import { useRouter } from "next/navigation";
 import { AnimatePresence, motion } from "framer-motion";
 import AuthModal from "./AuthModal";
 import Image from "next/image";
+import { authService } from "@/services/auth.service";
 
 type PropsType = {
   authModalOpen?: boolean;
@@ -35,8 +37,11 @@ const Nav = ({
   onMenuClick,
 }: NavProps & PropsType) => {
   const { theme, toggleTheme } = useTheme();
-  const { user, logout } = useAuth();
+  const { user, logout, setUser } = useAuth();
   const router = useRouter();
+
+  // Loading state for profile image upload
+  const [isUploading, setIsUploading] = useState(false);
 
   // Dropdown open/close state
   const [dropdownOpen, setDropdownOpen] = useState(false);
@@ -60,6 +65,30 @@ const Nav = ({
       document.removeEventListener("mousedown", handleClickOutside);
     };
   }, []);
+
+  // Handle Image Upload & Profile Update
+  const handleImageChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    try {
+      setIsUploading(true);
+      const formData = new FormData();
+      formData.append("image", file);
+
+      const res = await authService.updateProfile(formData);
+
+      if (res?.data) {
+        setUser(res.data); // Update the user state with the new profile picture
+      }
+    } catch (error) {
+      console.error("Failed to update profile picture:", error);
+    } finally {
+      setIsUploading(false);
+      // Reset input value taaki same file repeat upload ho sake agar zarurat pade
+      e.target.value = "";
+    }
+  };
 
   return (
     <>
@@ -129,17 +158,19 @@ const Nav = ({
                   aria-label="Open profile menu"
                   className="relative flex h-10 w-10 items-center justify-center overflow-hidden rounded-full border-2 border-transparent bg-primary font-semibold text-primary-foreground transition-all hover:border-primary/50"
                 >
-                  {user.imageUrl ? (
+                  {isUploading ? (
+                    <Loader2 size={18} className="animate-spin text-primary-foreground" />
+                  ) : user.imageUrl ? (
                     <img
                       src={user.imageUrl}
-                      alt={user.name}
+                      alt={user.name || "User"}
                       className="h-full w-full object-cover"
                     />
                   ) : (
                     <span>
                       {user.name
                         ?.charAt(0)
-                        .toUpperCase()}
+                        .toUpperCase() || "U"}
                     </span>
                   )}
                 </button>
@@ -174,43 +205,48 @@ const Nav = ({
                       {/* User Info */}
                       <div className="flex flex-col items-center border-b border-border pb-4 text-center">
 
-                        {/* Profile Image */}
+                        {/* Profile Image & Upload Container */}
                         <div className="group relative mb-2 flex h-16 w-16 items-center justify-center overflow-hidden rounded-full border border-border bg-primary/10 text-xl font-bold text-primary">
 
                           {user.imageUrl ? (
                             <img
                               src={user.imageUrl}
-                              alt={user.name}
+                              alt={user.name || "User"}
                               className="h-full w-full object-cover"
                             />
                           ) : (
                             <span>
                               {user.name
                                 ?.charAt(0)
-                                .toUpperCase()}
+                                .toUpperCase() || "U"}
                             </span>
                           )}
 
-                          {/* Image Upload Overlay */}
-                          <label className="absolute inset-0 flex cursor-pointer flex-col items-center justify-center bg-black/60 text-[10px] text-white opacity-0 transition-opacity group-hover:opacity-100">
-
-                            <IoCameraOutline size={18} />
-
-                            <span>
-                              Update
-                            </span>
-
-                            <input
-                              type="file"
-                              accept="image/*"
-                              className="hidden"
-                            />
-                          </label>
+                          {/* Uploading Overlay with Spinner */}
+                          {isUploading ? (
+                            <div className="absolute inset-0 flex flex-col items-center justify-center bg-black/70 text-white backdrop-blur-[1px]">
+                              <Loader2 size={20} className="animate-spin mb-1" />
+                              <span className="text-[9px] font-medium tracking-wide">Uploading...</span>
+                            </div>
+                          ) : (
+                            /* Hover Camera Overlay */
+                            <label className="absolute inset-0 flex cursor-pointer flex-col items-center justify-center bg-black/60 text-[10px] text-white opacity-0 transition-opacity group-hover:opacity-100">
+                              <IoCameraOutline size={18} />
+                              <span>Update</span>
+                              <input
+                                onChange={handleImageChange}
+                                type="file"
+                                accept="image/*"
+                                disabled={isUploading}
+                                className="hidden"
+                              />
+                            </label>
+                          )}
                         </div>
 
                         {/* Name */}
                         <h4 className="line-clamp-1 text-sm font-semibold text-foreground">
-                          {user.name}
+                          {user.name || "User"}
                         </h4>
 
                         {/* Email */}

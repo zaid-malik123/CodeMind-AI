@@ -164,12 +164,7 @@ const Chat = () => {
                             </span>
                           </div>
 
-                          <button
-                            type="button"
-                            className="rounded-lg p-1 text-muted-foreground hover:bg-muted hover:text-foreground"
-                          >
-                            <MoreVertical size={16} />
-                          </button>
+                         
                         </div>
 
                         {/* Github Link */}
